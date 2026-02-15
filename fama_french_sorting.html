@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fama-French Double Sorting Method</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .example-stocks {
+            background: #edf2f7;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .example-stocks h3 {
+            color: #2d3748;
+            margin-top: 0;
+        }
+        
+        .stock-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+        
+        .stock-table th {
+            background: #4a5568;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .stock-table td {
+            padding: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .stock-table tr:hover {
+            background: #f7fafc;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: 100px repeat(3, 1fr);
+            gap: 2px;
+            background: #e2e8f0;
+            padding: 2px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        
+        .cell {
+            background: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 120px;
+        }
+        
+        .header-cell {
+            background: #4a5568;
+            color: white;
+            font-size: 12px;
+        }
+        
+        .row-label {
+            background: #4a5568;
+            color: white;
+            font-size: 12px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+        
+        .portfolio-cell {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 11px;
+            padding: 10px;
+        }
+        
+        .portfolio-cell:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .portfolio-name {
+            font-size: 16px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .stock-list {
+            font-size: 11px;
+            line-height: 1.5;
+            opacity: 0.95;
+        }
+        
+        .corner-cell {
+            background: #2d3748;
+        }
+        
+        .explanation {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .explanation h3 {
+            color: #2d3748;
+            margin-top: 0;
+        }
+        
+        .explanation p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+        
+        .axis-label {
+            text-align: center;
+            margin: 15px 0;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        .axis-label.vertical {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            position: absolute;
+            left: -50px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .grid-wrapper {
+            position: relative;
+            margin-left: 70px;
+        }
+        
+        .breakpoint {
+            background: #fef5e7;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .breakpoint strong {
+            color: #d68910;
+        }
+        
+        .highlight {
+            background: #fef5e7;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Fama-French Double Sorting Method</h1>
+        <div class="subtitle">Concrete Example with 10 Stocks</div>
+        
+        <div class="example-stocks">
+            <h3>Starting Universe: 10 Example Stocks</h3>
+            <table class="stock-table">
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Ticker</th>
+                        <th>Market Cap ($B)</th>
+                        <th>Book-to-Market</th>
+                        <th>Size Group</th>
+                        <th>Value Group</th>
+                        <th>Final Portfolio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Apple</td>
+                        <td>AAPL</td>
+                        <td>2,800</td>
+                        <td>0.15</td>
+                        <td>Big</td>
+                        <td>Low (Growth)</td>
+                        <td><strong>B/L</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Microsoft</td>
+                        <td>MSFT</td>
+                        <td>2,500</td>
+                        <td>0.28</td>
+                        <td>Big</td>
+                        <td>Low (Growth)</td>
+                        <td><strong>B/L</strong></td>
+                    </tr>
+                    <tr>
+                        <td>JPMorgan</td>
+                        <td>JPM</td>
+                        <td>450</td>
+                        <td>0.65</td>
+                        <td>Big</td>
+                        <td>Medium</td>
+                        <td><strong>B/M</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Chevron</td>
+                        <td>CVX</td>
+                        <td>280</td>
+                        <td>0.85</td>
+                        <td>Big</td>
+                        <td>High (Value)</td>
+                        <td><strong>B/H</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Ford</td>
+                        <td>F</td>
+                        <td>42</td>
+                        <td>1.20</td>
+                        <td>Big</td>
+                        <td>High (Value)</td>
+                        <td><strong>B/H</strong></td>
+                    </tr>
+                    <tr style="background: #fff3cd;">
+                        <td colspan="7" style="text-align: center; font-weight: bold; color: #856404;">← MEDIAN MARKET CAP = $46B (splits Big/Small) →</td>
+                    </tr>
+                    <tr>
+                        <td>Shopify</td>
+                        <td>SHOP</td>
+                        <td>38</td>
+                        <td>0.22</td>
+                        <td>Small</td>
+                        <td>Low (Growth)</td>
+                        <td><strong>S/L</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Etsy</td>
+                        <td>ETSY</td>
+                        <td>12</td>
+                        <td>0.18</td>
+                        <td>Small</td>
+                        <td>Low (Growth)</td>
+                        <td><strong>S/L</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Builders FirstSource</td>
+                        <td>BLDR</td>
+                        <td>8</td>
+                        <td>0.55</td>
+                        <td>Small</td>
+                        <td>Medium</td>
+                        <td><strong>S/M</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Foot Locker</td>
+                        <td>FL</td>
+                        <td>2</td>
+                        <td>0.95</td>
+                        <td>Small</td>
+                        <td>High (Value)</td>
+                        <td><strong>S/H</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Regional Bank Co</td>
+                        <td>RBC</td>
+                        <td>1.5</td>
+                        <td>1.35</td>
+                        <td>Small</td>
+                        <td>High (Value)</td>
+                        <td><strong>S/H</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="breakpoint">
+            <strong>Sorting Breakpoints:</strong><br>
+            • Size: Median = $46B (5 stocks above = Big, 5 stocks below = Small)<br>
+            • B/M for ALL 10 stocks: 30th percentile = 0.24, 70th percentile = 0.93<br>
+            • Low (Growth) = B/M < 0.24 | Medium = 0.24 ≤ B/M < 0.93 | High (Value) = B/M ≥ 0.93
+        </div>
+        
+        <div class="axis-label">Book-to-Market Ratio (Value) →</div>
+        
+        <div class="grid-wrapper">
+            <div class="axis-label vertical">← Market Cap (Size)</div>
+            
+            <div class="grid-container">
+                <!-- Header Row -->
+                <div class="cell corner-cell"></div>
+                <div class="cell header-cell">LOW<br>(B/M < 0.24)<br>Growth</div>
+                <div class="cell header-cell">MEDIUM<br>(0.24 ≤ B/M < 0.93)<br>Neutral</div>
+                <div class="cell header-cell">HIGH<br>(B/M ≥ 0.93)<br>Value</div>
+                
+                <!-- Small Cap Row -->
+                <div class="cell row-label">SMALL<br>(Cap < $46B)</div>
+                <div class="cell portfolio-cell">
+                    <div class="portfolio-name">S/L</div>
+                    <div class="stock-list">
+                        • Shopify<br>
+                        • Etsy<br>
+                        <br>
+                        <em>Small Growth</em>
+                    </div>
+                </div>
+                <div class="cell portfolio-cell">
+                    <div class="portfolio-name">S/M</div>
+                    <div class="stock-list">
+                        • Builders FirstSource<br>
+                        <br>
+                        <em>Small Neutral</em>
+                    </div>
+                </div>
+                <div class="cell portfolio-cell">
+                    <div class="portfolio-name">S/H</div>
+                    <div class="stock-list">
+                        • Foot Locker<br>
+                        • Regional Bank Co<br>
+                        <br>
+                        <em>Small Value</em>
+                    </div>
+                </div>
+                
+                <!-- Big Cap Row -->
+                <div class="cell row-label">BIG<br>(Cap ≥ $46B)</div>
+                <div class="cell portfolio-cell">
+                    <div class="portfolio-name">B/L</div>
+                    <div class="stock-list">
+                        • Apple<br>
+                        • Microsoft<br>
+                        <br>
+                        <em>Big Growth</em>
+                    </div>
+                </div>
+                <div class="cell portfolio-cell">
+                    <div class="portfolio-name">B/M</div>
+                    <div class="stock-list">
+                        • JPMorgan<br>
+                        <br>
+                        <em>Big Neutral</em>
+                    </div>
+                </div>
+                <div class="cell portfolio-cell">
+                    <div class="portfolio-name">B/H</div>
+                    <div class="stock-list">
+                        • Chevron<br>
+                        • Ford<br>
+                        <br>
+                        <em>Big Value</em>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="explanation">
+            <h3>Step-by-Step Process:</h3>
+            
+            <p><strong>Step 1 - Size Sort (First Dimension):</strong></p>
+            <p>Calculate median market cap across all 10 stocks = <span class="highlight">$46B</span></p>
+            <ul style="color: #4a5568; line-height: 1.8;">
+                <li><strong>Big (5 stocks):</strong> AAPL, MSFT, JPM, CVX, F (all ≥ $46B)</li>
+                <li><strong>Small (5 stocks):</strong> SHOP, ETSY, BLDR, FL, RBC (all < $46B)</li>
+            </ul>
+            
+            <p><strong>Step 2 - Book-to-Market Sort (Second Dimension):</strong></p>
+            <p>Calculate B/M breakpoints using <strong>all 10 stocks together</strong> (not within size groups):</p>
+            <ul style="color: #4a5568; line-height: 1.8;">
+                <li><strong>30th percentile:</strong> B/M = 0.24 (3rd stock when sorted)</li>
+                <li><strong>70th percentile:</strong> B/M = 0.93 (7th stock when sorted)</li>
+            </ul>
+            
+            <p>Apply these breakpoints to assign each stock:</p>
+            <ul style="color: #4a5568; line-height: 1.8;">
+                <li><strong>Low (Growth):</strong> B/M < 0.24 → AAPL, MSFT, SHOP, ETSY</li>
+                <li><strong>Medium (Neutral):</strong> 0.24 ≤ B/M < 0.93 → JPM, BLDR</li>
+                <li><strong>High (Value):</strong> B/M ≥ 0.93 → CVX, F, FL, RBC</li>
+            </ul>
+            
+            <p><strong>Step 3 - Create Six Portfolios:</strong></p>
+            <p>Combine size and value classifications to form 2×3 = 6 portfolios.</p>
+            
+            <p><strong>Step 4 - Calculate Factor Returns:</strong></p>
+            <ul style="color: #4a5568; line-height: 1.8;">
+                <li><strong>SMB</strong> = [(S/L + S/M + S/H)/3] - [(B/L + B/M + B/H)/3]</li>
+                <li><strong>HML</strong> = [(S/H + B/H)/2] - [(S/L + B/L)/2]</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
