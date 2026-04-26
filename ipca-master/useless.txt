@@ -1,0 +1,386 @@
+'''
+import pandas as pd
+import numpy as np
+from ipca import InstrumentedPCA
+
+print("Loading data...")
+data = pd.read_feather("chars_raw_imputed.feather")
+
+# Ensure date is datetime
+data["date"] = pd.to_datetime(data["date"])
+
+# Market-cap proxy for value weights
+data["size"] = (data["prc"] * data["shrout"]).abs()
+
+# Set panel index
+data = data.set_index(["permno", "date"]).sort_index()
+
+# In-sample / out-of-sample split
+split_date = pd.Timestamp("2015-12-31")
+
+data_is = data[data.index.get_level_values("date") <= split_date].copy()
+data_oos = data[data.index.get_level_values("date") > split_date].copy()
+
+chars = [
+    "abr", "absacc", "acc", "adm", "age",
+    "agr", "alm", "ato", "baspread", "beta", "size"
+]
+
+y_is = data_is["ret"]
+X_is = data_is[chars]
+
+y_oos = data_oos["ret"]
+X_oos = data_oos[chars]
+
+print("Fitting IPCA...")
+regr = InstrumentedPCA(n_factors=1, intercept=False)
+regr = regr.fit(X=X_is, y=y_is)
+
+print("Predicting OOS...")
+X_pred = X_oos.loc[~X_oos.isna().any(axis=1)].copy()
+
+pre_y = regr.predict(
+    X=X_pred,
+    mean_factor=True,
+    data_type="panel",
+    label_ind=False
+)
+
+# Store OOS predicted returns
+full_fitted = pd.Series(index=X_oos.index, dtype=float, name="fitted")
+full_fitted.loc[X_pred.index] = np.asarray(pre_y).ravel()
+
+# Merge signal, realized return, and size
+result = pd.concat(
+    [
+        full_fitted,
+        y_oos.rename("ret"),
+        data_oos["size"].rename("size"),
+    ],
+    axis=1
+)
+
+# Keep only valid observations
+df = result.dropna(subset=["fitted", "ret", "size"]).copy()
+
+print("Constructing value-weighted long-short decile portfolio...")
+
+# Cross-sectional percentile rank by date based on fitted return
+df["rank"] = df.groupby(level="date")["fitted"].rank(pct=True, method="first")
+
+# Top decile long, bottom decile short
+long_df = df[df["rank"] >= 0.9].copy()
+short_df = df[df["rank"] <= 0.1].copy()
+
+# Value weights within each date
+long_df["weight"] = long_df.groupby(level="date")["size"].transform(lambda x: x / x.sum())
+short_df["weight"] = short_df.groupby(level="date")["size"].transform(lambda x: x / x.sum())
+
+# Value-weighted portfolio returns by date
+long_ret = long_df.groupby(level="date").apply(
+    lambda x: (x["weight"] * x["ret"]).sum()
+)
+long_ret.name = "long_ret"
+
+short_ret = short_df.groupby(level="date").apply(
+    lambda x: (x["weight"] * x["ret"]).sum()
+)
+short_ret.name = "short_ret"
+
+# Long-short return
+portfolio = pd.concat([long_ret, short_ret], axis=1)
+portfolio["ls_ret"] = portfolio["long_ret"] - portfolio["short_ret"]
+
+print("Computing OOS Sharpe ratio...")
+
+# Annualized Sharpe ratio assuming monthly returns
+mean_ls = portfolio["ls_ret"].mean()
+std_ls = portfolio["ls_ret"].std()
+
+if pd.notna(std_ls) and std_ls > 0:
+    sharpe_oos = mean_ls / std_ls * np.sqrt(12)
+else:
+    sharpe_oos = np.nan
+
+print(f"OOS long-short Sharpe ratio: {sharpe_oos:.6f}")
+
+print("Saving time-series...")
+
+timeseries = portfolio.reset_index().copy()
+timeseries = timeseries.sort_values("date")
+timeseries = timeseries[["date", "long_ret", "short_ret", "ls_ret"]]
+
+timeseries.to_feather("ipca_oos_ls_timeseries.feather")
+timeseries.to_csv("ipca_oos_ls_timeseries.csv", index=False)
+
+print("Saving summary...")
+
+summary = pd.DataFrame({
+    "metric": [
+        "oos_sharpe",
+        "mean_ls_return",
+        "std_ls_return",
+        "n_periods"
+    ],
+    "value": [
+        sharpe_oos,
+        mean_ls,
+        std_ls,
+        timeseries["ls_ret"].notna().sum()
+    ]
+})
+
+summary.to_csv("ipca_oos_summary.csv", index=False)
+
+print("Saving stock-level OOS predictions...")
+result.reset_index().to_feather("ipca_oos_predictions.feather")
+
+print("Done.")
+'''
+
+'''
+import os
+import warnings
+import numpy as np
+import pandas as pd
+from joblib import Parallel, delayed
+from ipca import InstrumentedPCA
+
+warnings.filterwarnings("ignore")
+
+print("Loading data...")
+data = pd.read_feather("chars_raw_imputed.feather")
+
+data["date"] = pd.to_datetime(data["date"])
+data["size"] = (data["prc"] * data["shrout"]).abs()
+
+data = data.set_index(["permno", "date"]).sort_index()
+
+chars = [
+    "abr", "absacc", "acc", "adm", "age",
+    "agr", "alm", "ato", "baspread", "beta", "size"
+]
+
+data = data[["ret"] + chars].copy()
+
+all_dates = pd.Index(sorted(data.index.get_level_values("date").unique()))
+
+train_years = 5
+test_years = 1
+months_per_year = 12
+train_months = train_years * months_per_year
+test_months = test_years * months_per_year
+
+n_jobs = int(os.environ.get("N_JOBS", "4"))
+print(f"Using n_jobs = {n_jobs}")
+
+
+def prepare_window_data(data_train, data_test, chars):
+    # Keep rows with complete X and non-missing y in training
+    train_df = data_train[["ret"] + chars].dropna().copy()
+    test_df = data_test[["ret"] + chars].copy()
+
+    if train_df.empty or test_df.empty:
+        return None
+
+    # Drop zero-variance columns in this training window
+    stds = train_df[chars].std()
+    valid_chars = stds[stds > 0].index.tolist()
+
+    if len(valid_chars) == 0:
+        return None
+
+    # Standardize using training-window stats to improve conditioning
+    means = train_df[valid_chars].mean()
+    stds = train_df[valid_chars].std()
+
+    train_df.loc[:, valid_chars] = (train_df[valid_chars] - means) / stds
+    test_df.loc[:, valid_chars] = (test_df[valid_chars] - means) / stds
+
+    # For prediction, require complete X on the surviving columns
+    test_pred_df = test_df.dropna(subset=valid_chars).copy()
+
+    if test_pred_df.empty:
+        return None
+
+    return train_df, test_df, test_pred_df, valid_chars
+
+
+def run_one_window(start_idx, data, all_dates, chars, train_months, test_months):
+    train_start = all_dates[start_idx]
+    train_end = all_dates[start_idx + train_months - 1]
+    test_start = all_dates[start_idx + train_months]
+    test_end = all_dates[start_idx + train_months + test_months - 1]
+
+    print(
+        f"Window {start_idx}: "
+        f"train {train_start.date()} to {train_end.date()} | "
+        f"test {test_start.date()} to {test_end.date()}"
+    )
+
+    date_index = data.index.get_level_values("date")
+
+    train_mask = (date_index >= train_start) & (date_index <= train_end)
+    test_mask = (date_index >= test_start) & (date_index <= test_end)
+
+    data_train = data.loc[train_mask].copy()
+    data_test = data.loc[test_mask].copy()
+
+    prepared = prepare_window_data(data_train, data_test, chars)
+    if prepared is None:
+        return None
+
+    train_df, test_df, test_pred_df, valid_chars = prepared
+
+    y_train = train_df["ret"]
+    X_train = train_df[valid_chars]
+
+    X_pred = test_pred_df[valid_chars]
+
+    try:
+        regr = InstrumentedPCA(n_factors=1, intercept=False)
+        regr = regr.fit(X=X_train, y=y_train)
+
+        pre_y = regr.predict(
+            X=X_pred,
+            mean_factor=True,
+            data_type="panel",
+            label_ind=False
+        )
+
+    except np.linalg.LinAlgError as e:
+        print(
+            f"Skipping window {train_start.date()} to {test_end.date()} "
+            f"due to singular matrix: {e}"
+        )
+        return None
+    except Exception as e:
+        print(
+            f"Skipping window {train_start.date()} to {test_end.date()} "
+            f"due to error: {e}"
+        )
+        return None
+
+    fitted = pd.Series(index=test_df.index, dtype=float, name="fitted")
+    fitted.loc[X_pred.index] = np.asarray(pre_y).ravel()
+
+    window_result = pd.concat(
+        [
+            fitted,
+            test_df["ret"].rename("ret"),
+            data_test["size"].rename("size"),
+        ],
+        axis=1
+    )
+
+    window_result["train_start"] = train_start
+    window_result["train_end"] = train_end
+    window_result["test_start"] = test_start
+    window_result["test_end"] = test_end
+    window_result["n_chars_used"] = len(valid_chars)
+
+    return window_result
+
+
+print("Preparing rolling windows...")
+window_start_indices = list(range(0, len(all_dates) - train_months - test_months + 1, test_months))
+print(f"Total rolling windows: {len(window_start_indices)}")
+
+print("Running rolling-window IPCA in parallel...")
+oos_prediction_list = Parallel(n_jobs=n_jobs, backend="loky", verbose=10)(
+    delayed(run_one_window)(
+        start_idx, data, all_dates, chars, train_months, test_months
+    )
+    for start_idx in window_start_indices
+)
+
+oos_prediction_list = [x for x in oos_prediction_list if x is not None]
+
+if not oos_prediction_list:
+    raise ValueError("No rolling-window OOS predictions were generated.")
+
+print(f"Successful windows: {len(oos_prediction_list)} / {len(window_start_indices)}")
+
+print("Combining all OOS predictions...")
+result = pd.concat(oos_prediction_list, axis=0)
+result = result[~result.index.duplicated(keep="first")].sort_index()
+
+df = result.dropna(subset=["fitted", "ret", "size"]).copy()
+
+print("Constructing value-weighted long-short decile portfolio...")
+
+df["rank"] = df.groupby(level="date")["fitted"].rank(pct=True, method="first")
+
+long_df = df[df["rank"] >= 0.9].copy()
+short_df = df[df["rank"] <= 0.1].copy()
+
+long_df["weight"] = long_df.groupby(level="date")["size"].transform(lambda x: x / x.sum())
+short_df["weight"] = short_df.groupby(level="date")["size"].transform(lambda x: x / x.sum())
+
+long_ret = long_df.groupby(level="date").apply(
+    lambda x: (x["weight"] * x["ret"]).sum(),
+    include_groups=False
+)
+long_ret.name = "long_ret"
+
+short_ret = short_df.groupby(level="date").apply(
+    lambda x: (x["weight"] * x["ret"]).sum(),
+    include_groups=False
+)
+short_ret.name = "short_ret"
+
+portfolio = pd.concat([long_ret, short_ret], axis=1)
+portfolio["ls_ret"] = portfolio["long_ret"] - portfolio["short_ret"]
+
+print("Computing rolling-window OOS Sharpe ratio...")
+
+mean_ls = portfolio["ls_ret"].mean()
+std_ls = portfolio["ls_ret"].std()
+
+if pd.notna(std_ls) and std_ls > 0:
+    sharpe_oos = mean_ls / std_ls * np.sqrt(12)
+else:
+    sharpe_oos = np.nan
+
+print(f"Rolling-window OOS long-short Sharpe ratio: {sharpe_oos:.6f}")
+
+print("Saving time-series...")
+timeseries = portfolio.reset_index().copy().sort_values("date")
+timeseries = timeseries[["date", "long_ret", "short_ret", "ls_ret"]]
+
+timeseries.to_feather(f"Results/ipca_rolling_oos_ls_timeseries_{train_years}.feather")
+timeseries.to_csv(f"Results/ipca_rolling_oos_ls_timeseries_{train_years}.csv", index=False)
+
+print("Saving summary...")
+summary = pd.DataFrame({
+    "metric": [
+        "rolling_oos_sharpe",
+        "mean_ls_return",
+        "std_ls_return",
+        "n_periods",
+        "train_years",
+        "test_years",
+        "n_jobs",
+        "n_total_windows",
+        "n_successful_windows"
+    ],
+    "value": [
+        sharpe_oos,
+        mean_ls,
+        std_ls,
+        timeseries["ls_ret"].notna().sum(),
+        train_years,
+        test_years,
+        n_jobs,
+        len(window_start_indices),
+        len(oos_prediction_list)
+    ]
+})
+
+summary.to_csv(f"Results/ipca_rolling_oos_summary_{train_years}.csv", index=False)
+
+print("Saving stock-level OOS predictions...")
+result.reset_index().to_feather("ipca_rolling_oos_predictions.feather")
+
+print("Done.")
+'''

@@ -1,0 +1,10 @@
+metric,value
+rolling_oos_sharpe,-0.1848756116870497
+mean_ls_return,-0.004233243111770245
+std_ls_return,0.07932027468056406
+n_periods,768.0
+train_years,10.0
+test_years,1.0
+n_jobs,4.0
+n_total_windows,64.0
+n_successful_windows,64.0
