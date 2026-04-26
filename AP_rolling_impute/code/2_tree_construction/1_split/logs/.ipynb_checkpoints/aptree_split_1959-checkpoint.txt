@@ -1,0 +1,2 @@
+[INFO] Reading data from: ../../../data/1_data_processing/2_rank_data/output/ranked_data.pkl.gz
+[WARNING] No data found for year 1959. Skip.

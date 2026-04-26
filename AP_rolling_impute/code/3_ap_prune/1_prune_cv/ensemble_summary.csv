@@ -1,0 +1,15 @@
+metric,value
+n_repeats_used,9.0
+n_yearly_sr_records,368.0
+n_monthly_return_obs,528.0
+mean_monthly_return,0.02918699679592766
+monthly_vol,0.030790717797492262
+annualized_return,0.40472644122736545
+annualized_vol,0.10666217525354374
+annualized_sharpe,3.283675405255673
+max_drawdown,-0.20528886082858455
+mean_yearly_test_SR,1.0443359236975205
+median_yearly_test_SR,0.9977860246675323
+std_yearly_test_SR,0.5619152944886725
+mean_turnover_ratio,
+median_turnover_ratio,

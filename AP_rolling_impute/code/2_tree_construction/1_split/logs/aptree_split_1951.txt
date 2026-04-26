@@ -1,0 +1,292 @@
+================================================================================
+[INFO] Repeat: 1/10
+[INFO] Seed used: 0
+[INFO] Year: 1951
+[INFO] Input shape: (3138, 95)
+[INFO] Number of combos: 10
+[INFO] Number of valid trees per combo: 78
+[INFO] Output dir: ../../../data/2_tree_construction/1_split/output/repeat_01_seed_0_B_10_depth_4
+[INFO] Repeat 1 | combo_0001 | features: ['size_rank', 'pchsale_pchinvt_rank', 'rsup_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 1 finished combo_0001
+[INFO] Repeat 1 | combo_0002 | features: ['size_rank', 'pchcurrat_rank', 'pchsale_pchinvt_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 1 finished combo_0002
+[INFO] Repeat 1 | combo_0003 | features: ['size_rank', 'ill_rank', 'std_dolvol_rank'] | shape after dropna: (3013, 7)
+[INFO] Repeat 1 finished combo_0003
+[INFO] Repeat 1 | combo_0004 | features: ['size_rank', 'dolvol_rank', 'lgr_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 1 finished combo_0004
+[INFO] Repeat 1 | combo_0005 | features: ['size_rank', 'cashpr_rank', 'pm_rank'] | shape after dropna: (3013, 7)
+[INFO] Repeat 1 finished combo_0005
+[INFO] Repeat 1 | combo_0006 | features: ['size_rank', 'acc_rank', 'bm_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 1 | combo_0006 has no valid rows after dropna, skip.
+[INFO] Repeat 1 | combo_0007 | features: ['size_rank', 'abr_rank', 'saleinv_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 1 | combo_0007 has no valid rows after dropna, skip.
+[INFO] Repeat 1 | combo_0008 | features: ['size_rank', 'cfp_ia_rank', 'sgr_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 1 finished combo_0008
+[INFO] Repeat 1 | combo_0009 | features: ['size_rank', 'beta_rank', 'dolvol_rank'] | shape after dropna: (3013, 7)
+[INFO] Repeat 1 finished combo_0009
+[INFO] Repeat 1 | combo_0010 | features: ['size_rank', 'adm_rank', 'seas1a_rank'] | shape after dropna: (2068, 7)
+[INFO] Repeat 1 finished combo_0010
+[INFO] Repeat 1 finished successfully
+================================================================================
+[INFO] Repeat: 2/10
+[INFO] Seed used: 1
+[INFO] Year: 1951
+[INFO] Input shape: (3138, 95)
+[INFO] Number of combos: 10
+[INFO] Number of valid trees per combo: 78
+[INFO] Output dir: ../../../data/2_tree_construction/1_split/output/repeat_02_seed_1_B_10_depth_4
+[INFO] Repeat 2 | combo_0001 | features: ['size_rank', 'chatoia_rank', 'divi_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 2 | combo_0001 has no valid rows after dropna, skip.
+[INFO] Repeat 2 | combo_0002 | features: ['size_rank', 'depr_rank', 'pchsaleinv_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 2 finished combo_0002
+[INFO] Repeat 2 | combo_0003 | features: ['size_rank', 'pchdepr_rank', 'pctacc_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 2 finished combo_0003
+[INFO] Repeat 2 | combo_0004 | features: ['size_rank', 'absacc_rank', 'roe_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 2 | combo_0004 has no valid rows after dropna, skip.
+[INFO] Repeat 2 | combo_0005 | features: ['size_rank', 'roe_rank', 'std_dolvol_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 2 | combo_0005 has no valid rows after dropna, skip.
+[INFO] Repeat 2 | combo_0006 | features: ['size_rank', 'dolvol_rank', 'me_ia_rank'] | shape after dropna: (3011, 7)
+[INFO] Repeat 2 finished combo_0006
+[INFO] Repeat 2 | combo_0007 | features: ['size_rank', 'ato_rank', 'pchcapx_ia_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 2 | combo_0007 has no valid rows after dropna, skip.
+[INFO] Repeat 2 | combo_0008 | features: ['size_rank', 'mom60m_rank', 'saleinv_rank'] | shape after dropna: (3013, 7)
+[INFO] Repeat 2 finished combo_0008
+[INFO] Repeat 2 | combo_0009 | features: ['size_rank', 'roe_rank', 'tb_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 2 | combo_0009 has no valid rows after dropna, skip.
+[INFO] Repeat 2 | combo_0010 | features: ['size_rank', 'cashdebt_rank', 'mom60m_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 2 finished combo_0010
+[INFO] Repeat 2 finished successfully
+================================================================================
+[INFO] Repeat: 3/10
+[INFO] Seed used: 2
+[INFO] Year: 1951
+[INFO] Input shape: (3138, 95)
+[INFO] Number of combos: 10
+[INFO] Number of valid trees per combo: 78
+[INFO] Output dir: ../../../data/2_tree_construction/1_split/output/repeat_03_seed_2_B_10_depth_4
+[INFO] Repeat 3 | combo_0001 | features: ['size_rank', 'grltnoa_rank', 'tang_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 3 | combo_0001 has no valid rows after dropna, skip.
+[INFO] Repeat 3 | combo_0002 | features: ['size_rank', 'cfp_ia_rank', 'lev_rank'] | shape after dropna: (3013, 7)
+[INFO] Repeat 3 finished combo_0002
+[INFO] Repeat 3 | combo_0003 | features: ['size_rank', 'chtx_rank', 'pchsaleinv_rank'] | shape after dropna: (708, 7)
+[INFO] Repeat 3 finished combo_0003
+[INFO] Repeat 3 | combo_0004 | features: ['size_rank', 'agr_rank', 'pscore_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 3 | combo_0004 has no valid rows after dropna, skip.
+[INFO] Repeat 3 | combo_0005 | features: ['size_rank', 'pchgm_pchsale_rank', 'std_turn_rank'] | shape after dropna: (712, 7)
+[INFO] Repeat 3 finished combo_0005
+[INFO] Repeat 3 | combo_0006 | features: ['size_rank', 'pchcurrat_rank', 'pchsale_pchrect_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 3 finished combo_0006
+[INFO] Repeat 3 | combo_0007 | features: ['size_rank', 'cashpr_rank', 'convind_rank'] | shape after dropna: (342, 7)
+[INFO] Repeat 3 finished combo_0007
+[INFO] Repeat 3 | combo_0008 | features: ['size_rank', 'age_rank', 'rna_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 3 | combo_0008 has no valid rows after dropna, skip.
+[INFO] Repeat 3 | combo_0009 | features: ['size_rank', 'currat_rank', 'divo_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 3 | combo_0009 has no valid rows after dropna, skip.
+[INFO] Repeat 3 | combo_0010 | features: ['size_rank', 'chcsho_rank', 'pchsale_pchrect_rank'] | shape after dropna: (191, 7)
+[INFO] Repeat 3 finished combo_0010
+[INFO] Repeat 3 finished successfully
+================================================================================
+[INFO] Repeat: 4/10
+[INFO] Seed used: 3
+[INFO] Year: 1951
+[INFO] Input shape: (3138, 95)
+[INFO] Number of combos: 10
+[INFO] Number of valid trees per combo: 78
+[INFO] Output dir: ../../../data/2_tree_construction/1_split/output/repeat_04_seed_3_B_10_depth_4
+[INFO] Repeat 4 | combo_0001 | features: ['size_rank', 'op_rank', 'saleinv_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 4 | combo_0001 has no valid rows after dropna, skip.
+[INFO] Repeat 4 | combo_0002 | features: ['size_rank', 'grcapx_rank', 'rd_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 4 | combo_0002 has no valid rows after dropna, skip.
+[INFO] Repeat 4 | combo_0003 | features: ['size_rank', 'pchsaleinv_rank', 'quick_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 4 finished combo_0003
+[INFO] Repeat 4 | combo_0004 | features: ['size_rank', 'beta_rank', 'mom60m_rank'] | shape after dropna: (3013, 7)
+[INFO] Repeat 4 finished combo_0004
+[INFO] Repeat 4 | combo_0005 | features: ['size_rank', 'pchcapx_ia_rank', 'secured_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 4 | combo_0005 has no valid rows after dropna, skip.
+[INFO] Repeat 4 | combo_0006 | features: ['size_rank', 'age_rank', 'lev_rank'] | shape after dropna: (3013, 7)
+[INFO] Repeat 4 finished combo_0006
+[INFO] Repeat 4 | combo_0007 | features: ['size_rank', 'absacc_rank', 'zerotrade_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 4 finished combo_0007
+[INFO] Repeat 4 | combo_0008 | features: ['size_rank', 'beta_rank', 'pchquick_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 4 finished combo_0008
+[INFO] Repeat 4 | combo_0009 | features: ['size_rank', 'age_rank', 'seas1a_rank'] | shape after dropna: (2924, 7)
+[INFO] Repeat 4 finished combo_0009
+[INFO] Repeat 4 | combo_0010 | features: ['size_rank', 'cash_rank', 'realestate_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 4 | combo_0010 has no valid rows after dropna, skip.
+[INFO] Repeat 4 finished successfully
+================================================================================
+[INFO] Repeat: 5/10
+[INFO] Seed used: 4
+[INFO] Year: 1951
+[INFO] Input shape: (3138, 95)
+[INFO] Number of combos: 10
+[INFO] Number of valid trees per combo: 78
+[INFO] Output dir: ../../../data/2_tree_construction/1_split/output/repeat_05_seed_4_B_10_depth_4
+[INFO] Repeat 5 | combo_0001 | features: ['size_rank', 'roavol_rank', 'rvar_ff3_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 5 | combo_0001 has no valid rows after dropna, skip.
+[INFO] Repeat 5 | combo_0002 | features: ['size_rank', 'roa_rank', 'stdcf_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 5 | combo_0002 has no valid rows after dropna, skip.
+[INFO] Repeat 5 | combo_0003 | features: ['size_rank', 'salecash_rank', 'saleinv_rank'] | shape after dropna: (3013, 7)
+[INFO] Repeat 5 finished combo_0003
+[INFO] Repeat 5 | combo_0004 | features: ['size_rank', 'herf_rank', 'rdm_rank'] | shape after dropna: (2672, 7)
+[INFO] Repeat 5 finished combo_0004
+[INFO] Repeat 5 | combo_0005 | features: ['size_rank', 'mom12m_rank', 'sin_rank'] | shape after dropna: (93, 7)
+[INFO] Repeat 5 finished combo_0005
+[INFO] Repeat 5 | combo_0006 | features: ['size_rank', 'currat_rank', 'invest_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 5 finished combo_0006
+[INFO] Repeat 5 | combo_0007 | features: ['size_rank', 'age_rank', 'chempia_rank'] | shape after dropna: (15, 7)
+[INFO] Repeat 5 finished combo_0007
+[INFO] Repeat 5 | combo_0008 | features: ['size_rank', 'saleinv_rank', 'tang_rank'] | shape after dropna: (3013, 7)
+[INFO] Repeat 5 finished combo_0008
+[INFO] Repeat 5 | combo_0009 | features: ['size_rank', 'dolvol_rank', 'me_rank'] | shape after dropna: (3013, 7)
+[INFO] Repeat 5 finished combo_0009
+[INFO] Repeat 5 | combo_0010 | features: ['size_rank', 'pctacc_rank', 'sin_rank'] | shape after dropna: (21, 7)
+[INFO] Repeat 5 finished combo_0010
+[INFO] Repeat 5 finished successfully
+================================================================================
+[INFO] Repeat: 6/10
+[INFO] Seed used: 5
+[INFO] Year: 1951
+[INFO] Input shape: (3138, 95)
+[INFO] Number of combos: 10
+[INFO] Number of valid trees per combo: 78
+[INFO] Output dir: ../../../data/2_tree_construction/1_split/output/repeat_06_seed_5_B_10_depth_4
+[INFO] Repeat 6 | combo_0001 | features: ['size_rank', 'op_rank', 'turn_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 6 | combo_0001 has no valid rows after dropna, skip.
+[INFO] Repeat 6 | combo_0002 | features: ['size_rank', 'ill_rank', 'pchsale_pchinvt_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 6 finished combo_0002
+[INFO] Repeat 6 | combo_0003 | features: ['size_rank', 'seas1a_rank', 'secured_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 6 | combo_0003 has no valid rows after dropna, skip.
+[INFO] Repeat 6 | combo_0004 | features: ['size_rank', 'cfp_rank', 'pchsale_pchxsga_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 6 finished combo_0004
+[INFO] Repeat 6 | combo_0005 | features: ['size_rank', 'dolvol_rank', 'pm_rank'] | shape after dropna: (3013, 7)
+[INFO] Repeat 6 finished combo_0005
+[INFO] Repeat 6 | combo_0006 | features: ['size_rank', 'lev_rank', 'salerec_rank'] | shape after dropna: (3013, 7)
+[INFO] Repeat 6 finished combo_0006
+[INFO] Repeat 6 | combo_0007 | features: ['size_rank', 'acc_rank', 'roavol_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 6 | combo_0007 has no valid rows after dropna, skip.
+[INFO] Repeat 6 | combo_0008 | features: ['size_rank', 'depr_rank', 'maxret_rank'] | shape after dropna: (3013, 7)
+[INFO] Repeat 6 finished combo_0008
+[INFO] Repeat 6 | combo_0009 | features: ['size_rank', 'pchcapx_ia_rank', 're_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 6 | combo_0009 has no valid rows after dropna, skip.
+[INFO] Repeat 6 | combo_0010 | features: ['size_rank', 'absacc_rank', 'cfp_ia_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 6 finished combo_0010
+[INFO] Repeat 6 finished successfully
+================================================================================
+[INFO] Repeat: 7/10
+[INFO] Seed used: 6
+[INFO] Year: 1951
+[INFO] Input shape: (3138, 95)
+[INFO] Number of combos: 10
+[INFO] Number of valid trees per combo: 78
+[INFO] Output dir: ../../../data/2_tree_construction/1_split/output/repeat_07_seed_6_B_10_depth_4
+[INFO] Repeat 7 | combo_0001 | features: ['size_rank', 'convind_rank', 'tang_rank'] | shape after dropna: (342, 7)
+[INFO] Repeat 7 finished combo_0001
+[INFO] Repeat 7 | combo_0002 | features: ['size_rank', 'convind_rank', 'rd_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 7 | combo_0002 has no valid rows after dropna, skip.
+[INFO] Repeat 7 | combo_0003 | features: ['size_rank', 'chmom_rank', 'chpmia_rank'] | shape after dropna: (81, 7)
+[INFO] Repeat 7 finished combo_0003
+[INFO] Repeat 7 | combo_0004 | features: ['size_rank', 'dolvol_rank', 'roe_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 7 | combo_0004 has no valid rows after dropna, skip.
+[INFO] Repeat 7 | combo_0005 | features: ['size_rank', 'sgr_rank', 'std_dolvol_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 7 finished combo_0005
+[INFO] Repeat 7 | combo_0006 | features: ['size_rank', 'invest_rank', 'rvar_ff3_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 7 finished combo_0006
+[INFO] Repeat 7 | combo_0007 | features: ['size_rank', 'roavol_rank', 'zerotrade_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 7 | combo_0007 has no valid rows after dropna, skip.
+[INFO] Repeat 7 | combo_0008 | features: ['size_rank', 'chempia_rank', 'chpmia_rank'] | shape after dropna: (13, 7)
+[INFO] Repeat 7 finished combo_0008
+[INFO] Repeat 7 | combo_0009 | features: ['size_rank', 'chinv_rank', 'realestate_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 7 | combo_0009 has no valid rows after dropna, skip.
+[INFO] Repeat 7 | combo_0010 | features: ['size_rank', 'egr_rank', 'lev_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 7 | combo_0010 has no valid rows after dropna, skip.
+[INFO] Repeat 7 finished successfully
+================================================================================
+[INFO] Repeat: 8/10
+[INFO] Seed used: 7
+[INFO] Year: 1951
+[INFO] Input shape: (3138, 95)
+[INFO] Number of combos: 10
+[INFO] Number of valid trees per combo: 78
+[INFO] Output dir: ../../../data/2_tree_construction/1_split/output/repeat_08_seed_7_B_10_depth_4
+[INFO] Repeat 8 | combo_0001 | features: ['size_rank', 'hire_rank', 'std_turn_rank'] | shape after dropna: (18, 7)
+[INFO] Repeat 8 finished combo_0001
+[INFO] Repeat 8 | combo_0002 | features: ['size_rank', 'quick_rank', 're_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 8 | combo_0002 has no valid rows after dropna, skip.
+[INFO] Repeat 8 | combo_0003 | features: ['size_rank', 'ni_rank', 'std_turn_rank'] | shape after dropna: (191, 7)
+[INFO] Repeat 8 finished combo_0003
+[INFO] Repeat 8 | combo_0004 | features: ['size_rank', 'pchgm_pchsale_rank', 'roic_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 8 | combo_0004 has no valid rows after dropna, skip.
+[INFO] Repeat 8 | combo_0005 | features: ['size_rank', 'grcapx_rank', 'mom1m_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 8 | combo_0005 has no valid rows after dropna, skip.
+[INFO] Repeat 8 | combo_0006 | features: ['size_rank', 'cfp_ia_rank', 'ni_rank'] | shape after dropna: (191, 7)
+[INFO] Repeat 8 finished combo_0006
+[INFO] Repeat 8 | combo_0007 | features: ['size_rank', 'roavol_rank', 'sin_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 8 | combo_0007 has no valid rows after dropna, skip.
+[INFO] Repeat 8 | combo_0008 | features: ['size_rank', 'acc_rank', 'saleinv_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 8 finished combo_0008
+[INFO] Repeat 8 | combo_0009 | features: ['size_rank', 'cash_rank', 'cfp_rank'] | shape after dropna: (3013, 7)
+[INFO] Repeat 8 finished combo_0009
+[INFO] Repeat 8 | combo_0010 | features: ['size_rank', 'lgr_rank', 'tang_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 8 finished combo_0010
+[INFO] Repeat 8 finished successfully
+================================================================================
+[INFO] Repeat: 9/10
+[INFO] Seed used: 8
+[INFO] Year: 1951
+[INFO] Input shape: (3138, 95)
+[INFO] Number of combos: 10
+[INFO] Number of valid trees per combo: 78
+[INFO] Output dir: ../../../data/2_tree_construction/1_split/output/repeat_09_seed_8_B_10_depth_4
+[INFO] Repeat 9 | combo_0001 | features: ['size_rank', 'chatoia_rank', 'pchsale_pchrect_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 9 | combo_0001 has no valid rows after dropna, skip.
+[INFO] Repeat 9 | combo_0002 | features: ['size_rank', 'noa_rank', 'pm_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 9 | combo_0002 has no valid rows after dropna, skip.
+[INFO] Repeat 9 | combo_0003 | features: ['size_rank', 'indmom_rank', 'pchsaleinv_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 9 finished combo_0003
+[INFO] Repeat 9 | combo_0004 | features: ['size_rank', 'pchsaleinv_rank', 'realestate_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 9 | combo_0004 has no valid rows after dropna, skip.
+[INFO] Repeat 9 | combo_0005 | features: ['size_rank', 'chcsho_rank', 'chinv_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 9 | combo_0005 has no valid rows after dropna, skip.
+[INFO] Repeat 9 | combo_0006 | features: ['size_rank', 'cash_rank', 'pchsale_pchinvt_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 9 finished combo_0006
+[INFO] Repeat 9 | combo_0007 | features: ['size_rank', 'indmom_rank', 'mom60m_rank'] | shape after dropna: (3013, 7)
+[INFO] Repeat 9 finished combo_0007
+[INFO] Repeat 9 | combo_0008 | features: ['size_rank', 'beta_rank', 'gma_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 9 finished combo_0008
+[INFO] Repeat 9 | combo_0009 | features: ['size_rank', 'securedind_rank', 'sue_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 9 | combo_0009 has no valid rows after dropna, skip.
+[INFO] Repeat 9 | combo_0010 | features: ['size_rank', 'mom12m_rank', 'pchcapx_ia_rank'] | shape after dropna: (365, 7)
+[INFO] Repeat 9 finished combo_0010
+[INFO] Repeat 9 finished successfully
+================================================================================
+[INFO] Repeat: 10/10
+[INFO] Seed used: 9
+[INFO] Year: 1951
+[INFO] Input shape: (3138, 95)
+[INFO] Number of combos: 10
+[INFO] Number of valid trees per combo: 78
+[INFO] Output dir: ../../../data/2_tree_construction/1_split/output/repeat_10_seed_9_B_10_depth_4
+[INFO] Repeat 10 | combo_0001 | features: ['size_rank', 'rvar_capm_rank', 'secured_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 10 | combo_0001 has no valid rows after dropna, skip.
+[INFO] Repeat 10 | combo_0002 | features: ['size_rank', 'pchsaleinv_rank', 'quick_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 10 finished combo_0002
+[INFO] Repeat 10 | combo_0003 | features: ['size_rank', 'cfp_rank', 'pscore_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 10 | combo_0003 has no valid rows after dropna, skip.
+[INFO] Repeat 10 | combo_0004 | features: ['size_rank', 'cinvest_rank', 'currat_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 10 | combo_0004 has no valid rows after dropna, skip.
+[INFO] Repeat 10 | combo_0005 | features: ['size_rank', 'herf_rank', 'mom12m_rank'] | shape after dropna: (3005, 7)
+[INFO] Repeat 10 finished combo_0005
+[INFO] Repeat 10 | combo_0006 | features: ['size_rank', 'agr_rank', 'std_dolvol_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 10 finished combo_0006
+[INFO] Repeat 10 | combo_0007 | features: ['size_rank', 'lev_rank', 're_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 10 | combo_0007 has no valid rows after dropna, skip.
+[INFO] Repeat 10 | combo_0008 | features: ['size_rank', 'nincr_rank', 'pchcapx_ia_rank'] | shape after dropna: (0, 7)
+[WARNING] Repeat 10 | combo_0008 has no valid rows after dropna, skip.
+[INFO] Repeat 10 | combo_0009 | features: ['size_rank', 'indmom_rank', 'pctacc_rank'] | shape after dropna: (713, 7)
+[INFO] Repeat 10 finished combo_0009
+[INFO] Repeat 10 | combo_0010 | features: ['size_rank', 'me_ia_rank', 'tb_rank'] | shape after dropna: (2539, 7)
+[INFO] Repeat 10 finished combo_0010
+[INFO] Repeat 10 finished successfully
+================================================================================
+[INFO] All repeats finished successfully

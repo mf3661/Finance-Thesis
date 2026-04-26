@@ -1,0 +1,14 @@
+metric,value
+n_time_points,44.0
+mean_test_SR,0.5864336106189615
+median_test_SR,0.6553323107622129
+std_test_SR,0.45026252913361253
+mean_test_SR_annualized,2.0314656177162087
+median_test_SR_annualized,2.2701377161633385
+std_test_SR_annualized,1.5597551544077575
+mean_K,5.0
+median_K,5.0
+mean_lambda0,0.0
+median_lambda0,0.0
+mean_lambda2,1.0000000000000003e-05
+median_lambda2,1e-05

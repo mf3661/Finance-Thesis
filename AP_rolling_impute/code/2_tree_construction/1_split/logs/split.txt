@@ -1,0 +1,1 @@
+slurmstepd: error: *** JOB 47894827 ON midway3-0517 CANCELLED AT 2026-04-03T14:23:51 ***
