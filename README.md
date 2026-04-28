@@ -69,5 +69,37 @@ Constructs AP Tree candidate portfolios from ranked firm characteristics and pre
 - `2_3_4_filter_benchmark.py`: Filters benchmark sorting portfolio outputs.
 - `2_3_5_filter_ptree.py`: Filters pruned-tree candidate portfolios.
 
+### 3_ap_prune
+
+Implements the pruning stage of the AP Tree framework, selecting an optimal sparse subset of candidate portfolios using cross-validation and out-of-sample performance criteria.
+
+#### 1_prune_cv
+
+- `1_prune_cv.py`: Main pruning engine that performs cross-validation over candidate AP Tree portfolios and selects the optimal portfolio subset.
+- `submit.sh`: Batch submission script for running pruning jobs in parallel on the cluster.
+- `ensemble_first9_summary.py`: Summarizes results across the first nine repeated pruning runs.
+- `ensemble_first9_summary_2.py`: Extended ensemble summary script for repeated-run robustness checks.
+- `logs/`: Cluster job logs for pruning runs.
+
+**Generated outputs**
+- `ensemble_summary.csv`: Final pruning performance summary across runs.
+- `ensemble_monthly_ret.csv`: Monthly long-short portfolio returns after pruning.
+- `ensemble_monthly_ret_detail.csv`: Detailed monthly return decomposition.
+- `ensemble_yearly_sr.csv`: Annual Sharpe ratios of pruned strategies.
+- `ensemble_yearly_sr_detail.csv`: Detailed yearly Sharpe statistics.
+- `ensemble_repeat_avg_sr.csv`: Average Sharpe ratio across repeated runs.
+- `ensemble_first_9_repeats_summary.csv`: Summary of first nine repeated runs.
+- `ensemble_first_9_repeats_timeseries.csv`: Return time series for first nine repeated runs.
+- `plot_cumulative_return.png`: Cumulative return plot.
+- `plot_drawdown.png`: Drawdown plot.
+- `plot_monthly_return.png`: Monthly return visualization.
+- `plot_yearly_sharpe.png`: Yearly Sharpe ratio visualization.
+
+#### 2_selection
+
+- `1_selection.py`: Final model selection script that chooses the preferred pruning specification after cross-validation.
+- `submit.sh`: Batch submission script for final selection runs.
+- `logs/`: Cluster logs for selection jobs.
+
 **Note:** AI help review and debug our code, and reformulate code. AI is not used in coding pipeline.
 
