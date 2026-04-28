@@ -101,5 +101,27 @@ Implements the pruning stage of the AP Tree framework, selecting an optimal spar
 - `submit.sh`: Batch submission script for final selection runs.
 - `logs/`: Cluster logs for selection jobs.
 
+### 4_ridge
+
+Implements the ridge regression benchmark used to compare AP Trees against regularized linear prediction models in the cross-section of stock returns.
+
+#### Main Scripts
+
+- `4_1_ridge.py`: Main ridge regression pipeline. Estimates monthly cross-sectional ridge models using firm characteristics and forms long-short portfolios from predicted returns.
+- `4_2_ridge_cv.py`: Selects the optimal ridge penalty parameter through cross-validation or rolling validation.
+- `4_3_ridge_oos.py`: Generates out-of-sample portfolio returns and prediction results using the selected ridge specification.
+- `4_4_ridge_summary.py`: Summarizes benchmark performance, including return, Sharpe ratio, alpha, and turnover statistics.
+- `submit.sh`: Batch submission script for running ridge jobs in parallel on the cluster.
+- `logs/`: Cluster job logs for ridge estimation runs.
+
+#### Generated Outputs
+
+- `ridge_monthly_ret.csv`: Monthly long-short returns from the ridge benchmark.
+- `ridge_summary.csv`: Overall performance summary of the ridge strategy.
+- `ridge_yearly_sr.csv`: Annual Sharpe ratio series.
+- `ridge_predictions.csv`: Predicted cross-sectional returns from the ridge model.
+- `plot_ridge_cumulative_return.png`: Cumulative return plot.
+- `plot_ridge_drawdown.png`: Drawdown plot.
+
 **Note:** AI help review and debug our code, and reformulate code. AI is not used in coding pipeline.
 
