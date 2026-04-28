@@ -123,5 +123,55 @@ Implements the ridge regression benchmark used to compare AP Trees against regul
 - `plot_ridge_cumulative_return.png`: Cumulative return plot.
 - `plot_ridge_drawdown.png`: Drawdown plot.
 
+### 5_IPCA
+
+Implements the Instrumented Principal Component Analysis (IPCA) benchmark used to compare AP Trees against characteristic-based latent factor models.
+
+#### Main Scripts
+
+- `5_1_ipca.py`: Main IPCA estimation pipeline. Uses firm characteristics as instruments to estimate latent factors and factor loadings.
+- `5_2_ipca_cv.py`: Selects the optimal number of latent factors and model settings through cross-validation or rolling validation.
+- `5_3_ipca_oos.py`: Generates out-of-sample expected returns and portfolio returns using the estimated IPCA model.
+- `5_4_ipca_summary.py`: Summarizes benchmark performance, including return, Sharpe ratio, alpha, and turnover statistics.
+- `submit.sh`: Batch submission script for running IPCA jobs in parallel on the cluster.
+- `logs/`: Cluster job logs for IPCA estimation runs.
+
+#### Generated Outputs
+
+- `ipca_monthly_ret.csv`: Monthly long-short returns from the IPCA benchmark.
+- `ipca_summary.csv`: Overall performance summary of the IPCA strategy.
+- `ipca_yearly_sr.csv`: Annual Sharpe ratio series.
+- `ipca_predictions.csv`: Predicted cross-sectional returns from the IPCA model.
+- `plot_ipca_cumulative_return.png`: Cumulative return plot.
+- `plot_ipca_drawdown.png`: Drawdown plot.
+
+## Extra Explanations
+### Feature Importance
+
+Feature importance is evaluated through a manual leave-one-feature-out procedure rather than a standalone script.
+
+For each firm characteristic, we remove the feature from the input set and rerun the **entire AP Tree pipeline**, including:
+
+1. Feature construction  
+2. Tree construction  
+3. Portfolio combination and filtering  
+4. Pruning / cross-validation  
+5. Out-of-sample portfolio evaluation  
+
+The importance of a characteristic is measured by the change in final performance after exclusion, such as:
+
+- Sharpe ratio decline  
+- Return reduction  
+- Alpha deterioration  
+- Changes in selected tree structures  
+
+We do not provide a dedicated feature-importance script because importance in our framework is **model-level rather than node-level**. The contribution of a characteristic affects every stage of the pipeline: candidate tree splits, portfolio interactions, pruning decisions, and final portfolio weights. As a result, meaningful importance must be evaluated by rerunning the full project after removing each feature.
+
+This process is computationally expensive and depends on the user’s chosen specifications (sample period, hyperparameters, rolling windows, benchmark settings, etc.). A standalone script would therefore be misleading or incomplete. Instead, feature importance should be implemented as a full re-estimation exercise under the user’s preferred setup.
+
+Compared with simple split-frequency or impurity metrics, this leave-one-feature-out approach provides a more economically relevant measure because it captures each characteristic’s contribution to final out-of-sample investment performance.
+
+
+
 **Note:** AI help review and debug our code, and reformulate code. AI is not used in coding pipeline.
 
