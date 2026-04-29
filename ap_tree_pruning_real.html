@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AP Tree Pruning with Real Companies</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #e53e3e;
+            transform: translateY(-2px);
+        }
+        
+        .info-box {
+            background: #edf2f7;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+        
+        .info-box h3 {
+            margin-top: 0;
+            color: #2d3748;
+        }
+        
+        .stage-indicator {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+        
+        .tree-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin: 30px 0;
+            min-height: 700px;
+            position: relative;
+            overflow-x: auto;
+        }
+        
+        .tree-svg {
+            width: 100%;
+            min-width: 1400px;
+            height: 700px;
+        }
+        
+        .node {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .node circle {
+            transition: all 0.3s;
+        }
+        
+        .node.pruned {
+            opacity: 0.3;
+        }
+        
+        .node.pruned circle {
+            fill: #cbd5e0 !important;
+        }
+        
+        .node.kept circle {
+            stroke: #48bb78;
+            stroke-width: 4;
+        }
+        
+        .node.intermediate circle {
+            fill: #fbd38d;
+        }
+        
+        .node.final circle {
+            fill: #9ae6b4;
+        }
+        
+        .node:hover:not(.pruned) circle {
+            stroke: #667eea;
+            stroke-width: 3;
+        }
+        
+        .link {
+            fill: none;
+            stroke: #cbd5e0;
+            stroke-width: 2;
+            transition: all 0.3s;
+        }
+        
+        .link.pruned {
+            opacity: 0.2;
+            stroke-dasharray: 5,5;
+        }
+        
+        .link.active {
+            stroke: #667eea;
+            stroke-width: 3;
+        }
+        
+        .node-label {
+            font-size: 12px;
+            fill: #2d3748;
+            font-weight: 600;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+        
+        .node-info {
+            font-size: 9px;
+            fill: #718096;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+        
+        .company-label {
+            font-size: 8px;
+            fill: #2d3748;
+            text-anchor: middle;
+            pointer-events: none;
+            font-weight: 500;
+        }
+        
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .stat-card {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #2d3748;
+        }
+        
+        .company-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 13px;
+        }
+        
+        .company-table th {
+            background: #4a5568;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .company-table td {
+            padding: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .company-table tr:hover {
+            background: #f7fafc;
+        }
+        
+        .explanation {
+            background: #fff5f5;
+            border-left: 4px solid #f56565;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .explanation.active {
+            display: block;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .node.highlight {
+            animation: pulse 1s infinite;
+        }
+        
+        .portfolio-detail {
+            background: #f7fafc;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .portfolio-detail h4 {
+            margin: 0 0 10px 0;
+            color: #2d3748;
+        }
+        
+        .company-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .chip {
+            background: white;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .chip .ticker {
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .chip .stats {
+            color: #718096;
+            margin-left: 5px;
+        }
+        
+        .portfolio-stats {
+            margin-top: 10px;
+            padding: 10px;
+            background: #edf2f7;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+        
+        .stat-label-small {
+            color: #718096;
+        }
+        
+        .stat-value-small {
+            font-weight: bold;
+            color: #2d3748;
+        }
+        
+        .variance-box {
+            background: #fffbeb;
+            border: 2px solid #f59e0b;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .variance-box h4 {
+            margin: 0 0 10px 0;
+            color: #b45309;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .metric-label {
+            font-size: 11px;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+        
+        .metric-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        
+        .better {
+            color: #48bb78;
+        }
+        
+        .worse {
+            color: #f56565;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌳 AP Tree Pruning with Real Companies</h1>
+        <div class="subtitle">Using 10 Real Stocks: AAPL, MSFT, JPM, CVX, F, SHOP, ETSY, BLDR, FL, RBC</div>
+        
+        <div class="info-box">
+            <h3>Our 10 Stock Universe (with Return Assumptions)</h3>
+            <table class="company-table">
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Ticker</th>
+                        <th>Market Cap ($B)</th>
+                        <th>B/M Ratio</th>
+                        <th>E[Return] %</th>
+                        <th>Volatility %</th>
+                        <th>Sharpe Ratio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Apple</td>
+                        <td>AAPL</td>
+                        <td>2,800</td>
+                        <td>0.15</td>
+                        <td>8.5</td>
+                        <td>25</td>
+                        <td>0.34</td>
+                    </tr>
+                    <tr>
+                        <td>Microsoft</td>
+                        <td>MSFT</td>
+                        <td>2,500</td>
+                        <td>0.28</td>
+                        <td>9.2</td>
+                        <td>26</td>
+                        <td>0.35</td>
+                    </tr>
+                    <tr>
+                        <td>JPMorgan</td>
+                        <td>JPM</td>
+                        <td>450</td>
+                        <td>0.65</td>
+                        <td>11.5</td>
+                        <td>32</td>
+                        <td>0.36</td>
+                    </tr>
+                    <tr>
+                        <td>Chevron</td>
+                        <td>CVX</td>
+                        <td>280</td>
+                        <td>0.85</td>
+                        <td>12.8</td>
+                        <td>28</td>
+                        <td>0.46</td>
+                    </tr>
+                    <tr>
+                        <td>Ford</td>
+                        <td>F</td>
+                        <td>42</td>
+                        <td>1.20</td>
+                        <td>14.2</td>
+                        <td>42</td>
+                        <td>0.34</td>
+                    </tr>
+                    <tr>
+                        <td>Shopify</td>
+                        <td>SHOP</td>
+                        <td>38</td>
+                        <td>0.22</td>
+                        <td>10.5</td>
+                        <td>55</td>
+                        <td>0.19</td>
+                    </tr>
+                    <tr>
+                        <td>Etsy</td>
+                        <td>ETSY</td>
+                        <td>12</td>
+                        <td>0.18</td>
+                        <td>9.8</td>
+                        <td>58</td>
+                        <td>0.17</td>
+                    </tr>
+                    <tr>
+                        <td>Builders FirstSource</td>
+                        <td>BLDR</td>
+                        <td>8</td>
+                        <td>0.55</td>
+                        <td>13.5</td>
+                        <td>48</td>
+                        <td>0.28</td>
+                    </tr>
+                    <tr>
+                        <td>Foot Locker</td>
+                        <td>FL</td>
+                        <td>2</td>
+                        <td>0.95</td>
+                        <td>15.5</td>
+                        <td>52</td>
+                        <td>0.30</td>
+                    </tr>
+                    <tr>
+                        <td>Regional Bank Co</td>
+                        <td>RBC</td>
+                        <td>1.5</td>
+                        <td>1.35</td>
+                        <td>16.8</td>
+                        <td>65</td>
+                        <td>0.26</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="margin-top: 15px; color: #718096;">
+                <strong>Breakpoints:</strong> Size median = $46B (splits at Ford/Shopify) | 
+                B/M 30th = 0.24, 70th = 0.93<br>
+                <strong>Assumptions:</strong> Risk-free rate = 0%, Expected returns follow size + value premiums, 
+                Volatility inversely related to market cap
+            </p>
+        </div>
+        
+        <div class="stage-indicator" id="stageIndicator">
+            Stage: Initial Full Tree (Before Pruning)
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-primary" onclick="showFullTree()">1. Show Full Tree</button>
+            <button class="btn btn-secondary" onclick="startPruning()">2. Start Pruning</button>
+            <button class="btn btn-secondary" onclick="pruneStep()">3. Prune Step by Step</button>
+            <button class="btn btn-danger" onclick="showFinalResult()">4. Show Final Result</button>
+            <button class="btn btn-primary" onclick="reset()">Reset</button>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-circle" style="background: #e3f2fd;"></div>
+                <span>Root Node</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-circle" style="background: #fbd38d;"></div>
+                <span>Intermediate Node</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-circle" style="background: #9ae6b4;"></div>
+                <span>Final Node</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-circle" style="background: #cbd5e0;"></div>
+                <span>Pruned Node</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-circle" style="background: white; border-color: #48bb78; border-width: 3px;"></div>
+                <span>Selected (Kept)</span>
+            </div>
+        </div>
+        
+        <div class="tree-container">
+            <svg id="treeSvg" class="tree-svg"></svg>
+        </div>
+        
+        <div class="explanation" id="explanation"></div>
+        
+        <div id="portfolioDetails"></div>
+        
+        <div class="stats-panel">
+            <div class="stat-card">
+                <div class="stat-label">Total Nodes</div>
+                <div class="stat-value" id="totalNodes">15</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Nodes Kept</div>
+                <div class="stat-value" id="keptNodes">15</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Stocks Covered</div>
+                <div class="stat-value" id="stocksCovered">10</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Pruning Rate</div>
+                <div class="stat-value" id="pruningRate">0%</div>
+            </div>
+        </div>
+        
+        <div class="info-box" style="margin-top: 30px;">
+            <h3>The Bias-Variance Tradeoff in Pruning</h3>
+            <ul>
+                <li><strong>Too many portfolios:</strong> With 3 characteristics at depth 3, we'd have 3³×2³ = 216 portfolios - infeasible!</li>
+                <li><strong>Variance cost of granularity:</strong> Smaller portfolios → higher estimation error in mean returns (σ/√n increases)</li>
+                <li><strong>Bias cost of aggregation:</strong> Larger portfolios → lose ability to capture heterogeneous return patterns</li>
+                <li><strong>Mean-variance optimization:</strong> Keep splits where information gain (Δ R²) exceeds variance cost</li>
+                <li><strong>Statistical principle:</strong> Prefer parent node unless children improve SDF spanning by threshold τ</li>
+            </ul>
+            <div style="margin-top: 15px; padding: 15px; background: #f0f9ff; border-radius: 6px; border-left: 3px solid #0284c7;">
+                <strong>Decision Rule:</strong> Keep split if <em>Information Gain</em> &gt; <em>k × Variance Increase</em><br>
+                where k is calibrated to optimize out-of-sample SDF R²
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Real company data with expected returns and volatility
+        const companies = {
+            'AAPL': { name: 'Apple', cap: 2800, bm: 0.15, ret: 8.5, vol: 25 },
+            'MSFT': { name: 'Microsoft', cap: 2500, bm: 0.28, ret: 9.2, vol: 26 },
+            'JPM': { name: 'JPMorgan', cap: 450, bm: 0.65, ret: 11.5, vol: 32 },
+            'CVX': { name: 'Chevron', cap: 280, bm: 0.85, ret: 12.8, vol: 28 },
+            'F': { name: 'Ford', cap: 42, bm: 1.20, ret: 14.2, vol: 42 },
+            'SHOP': { name: 'Shopify', cap: 38, bm: 0.22, ret: 10.5, vol: 55 },
+            'ETSY': { name: 'Etsy', cap: 12, bm: 0.18, ret: 9.8, vol: 58 },
+            'BLDR': { name: 'Builders', cap: 8, bm: 0.55, ret: 13.5, vol: 48 },
+            'FL': { name: 'FootLocker', cap: 2, bm: 0.95, ret: 15.5, vol: 52 },
+            'RBC': { name: 'RegBank', cap: 1.5, bm: 1.35, ret: 16.8, vol: 65 }
+        };
+        
+        // Tree structure with real companies
+        const treeData = {
+            id: 1,
+            label: "All Stocks",
+            info: "Complete Universe",
+            type: "root",
+            companies: ['AAPL', 'MSFT', 'JPM', 'CVX', 'F', 'SHOP', 'ETSY', 'BLDR', 'FL', 'RBC'],
+            level: 0,
+            x: 700,
+            y: 40,
+            children: [
+                {
+                    id: 11,
+                    label: "Low B/M (Growth)",
+                    info: "B/M < 0.24",
+                    type: "intermediate",
+                    companies: ['AAPL', 'MSFT', 'SHOP', 'ETSY'],
+                    level: 1,
+                    x: 300,
+                    y: 150,
+                    children: [
+                        {
+                            id: 111,
+                            label: "Growth + Small",
+                            info: "Cap < $46B",
+                            type: "final",
+                            companies: ['SHOP', 'ETSY'],
+                            level: 2,
+                            x: 150,
+                            y: 280
+                        },
+                        {
+                            id: 112,
+                            label: "Growth + Big",
+                            info: "Cap ≥ $46B",
+                            type: "final",
+                            companies: ['AAPL', 'MSFT'],
+                            level: 2,
+                            x: 450,
+                            y: 280
+                        }
+                    ]
+                },
+                {
+                    id: 12,
+                    label: "Medium B/M",
+                    info: "0.24 ≤ B/M < 0.93",
+                    type: "intermediate",
+                    companies: ['JPM', 'BLDR'],
+                    level: 1,
+                    x: 700,
+                    y: 150,
+                    children: [
+                        {
+                            id: 121,
+                            label: "Neutral + Small",
+                            info: "Cap < $46B",
+                            type: "final",
+                            companies: ['BLDR'],
+                            level: 2,
+                            x: 600,
+                            y: 280
+                        },
+                        {
+                            id: 122,
+                            label: "Neutral + Big",
+                            info: "Cap ≥ $46B",
+                            type: "final",
+                            companies: ['JPM'],
+                            level: 2,
+                            x: 800,
+                            y: 280
+                        }
+                    ]
+                },
+                {
+                    id: 13,
+                    label: "High B/M (Value)",
+                    info: "B/M ≥ 0.93",
+                    type: "intermediate",
+                    companies: ['CVX', 'F', 'FL', 'RBC'],
+                    level: 1,
+                    x: 1100,
+                    y: 150,
+                    children: [
+                        {
+                            id: 131,
+                            label: "Value + Small",
+                            info: "Cap < $46B",
+                            type: "final",
+                            companies: ['F', 'FL', 'RBC'],
+                            level: 2,
+                            x: 950,
+                            y: 280,
+                            children: [
+                                {
+                                    id: 1311,
+                                    label: "Small Value + Ultra Small",
+                                    info: "Cap < $10B",
+                                    type: "final",
+                                    companies: ['FL', 'RBC'],
+                                    level: 3,
+                                    x: 850,
+                                    y: 440
+                                },
+                                {
+                                    id: 1312,
+                                    label: "Small Value + Mid",
+                                    info: "Cap ≥ $10B",
+                                    type: "final",
+                                    companies: ['F'],
+                                    level: 3,
+                                    x: 1050,
+                                    y: 440
+                                }
+                            ]
+                        },
+                        {
+                            id: 132,
+                            label: "Value + Big",
+                            info: "Cap ≥ $46B",
+                            type: "final",
+                            companies: ['CVX'],
+                            level: 2,
+                            x: 1250,
+                            y: 280
+                        }
+                    ]
+                }
+            ]
+        };
+        
+        let currentStep = 0;
+        let prunedNodes = new Set();
+        let keptNodes = new Set([1]); // Root is always kept
+        
+        // Pruning sequence with reasoning and mean-variance analysis
+        const pruningSequence = [
+            {
+                step: 1,
+                prune: [112], // Growth + Big (AAPL, MSFT)
+                keep: [11, 111],
+                explanation: "<strong>Step 1: Prune 'Growth + Big' (AAPL, MSFT)</strong><br>" +
+                    "These two mega-cap growth stocks are too similar and too dominant (combined $5,300B market cap). " +
+                    "Not informative to isolate them - they're better captured by their parent 'Low B/M' group. " +
+                    "Keep the small growth split (SHOP, ETSY) as it's more distinct." +
+                    "<div class='variance-box'>" +
+                    "<h4>📊 Mean-Variance Analysis</h4>" +
+                    "<div class='comparison-grid'>" +
+                    "<div class='metric-card'><div class='metric-label'>AAPL+MSFT Portfolio</div>" +
+                    "<div class='metric-value'>E[R]=8.8%, σ=25.5%</div></div>" +
+                    "<div class='metric-card'><div class='metric-label'>All Growth (Parent)</div>" +
+                    "<div class='metric-value'>E[R]=9.2%, σ=32.1%</div></div>" +
+                    "<div class='metric-card'><div class='metric-label'>Information Gain</div>" +
+                    "<div class='metric-value worse'>Low (0.3% R²)</div></div>" +
+                    "<div class='metric-card'><div class='metric-label'>Estimation Error</div>" +
+                    "<div class='metric-value worse'>High (N=2, corr=0.85)</div></div>" +
+                    "</div>" +
+                    "<p style='margin: 10px 0 0 0; font-size: 12px;'><strong>Decision:</strong> The split doesn't meaningfully improve " +
+                    "our ability to span the SDF. AAPL and MSFT are highly correlated (ρ≈0.85) with similar characteristics. " +
+                    "The variance cost of estimating separate returns for just 2 similar stocks outweighs the tiny information gain.</p>" +
+                    "</div>",
+                highlight: ['AAPL', 'MSFT']
+            },
+            {
+                step: 2,
+                prune: [121, 122], // Neutral splits
+                keep: [12],
+                explanation: "<strong>Step 2: Prune Medium B/M Size Splits</strong><br>" +
+                    "Only 2 stocks in this category (JPM, BLDR). Splitting by size doesn't add information - " +
+                    "the parent 'Medium B/M' node captures them adequately. Further granularity increases variance without gain." +
+                    "<div class='variance-box'>" +
+                    "<h4>📊 Mean-Variance Analysis</h4>" +
+                    "<div class='comparison-grid'>" +
+                    "<div class='metric-card'><div class='metric-label'>Split: JPM (Big)</div>" +
+                    "<div class='metric-value'>E[R]=11.5%, σ=32%</div></div>" +
+                    "<div class='metric-card'><div class='metric-label'>Split: BLDR (Small)</div>" +
+                    "<div class='metric-value'>E[R]=13.5%, σ=48%</div></div>" +
+                    "<div class='metric-card'><div class='metric-label'>Combined Portfolio</div>" +
+                    "<div class='metric-value better'>E[R]=12.0%, σ=28% ✓</div></div>" +
+                    "<div class='metric-card'><div class='metric-label'>Portfolio Size</div>" +
+                    "<div class='metric-value worse'>N=1 each (unstable!)</div></div>" +
+                    "</div>" +
+                    "<p style='margin: 10px 0 0 0; font-size: 12px;'><strong>Decision:</strong> Single-stock portfolios have massive " +
+                    "estimation error and idiosyncratic risk. While BLDR has higher expected return, it also has 50% more volatility. " +
+                    "The parent portfolio achieves better diversification (σ drops from 48%→28%) without sacrificing much return information.</p>" +
+                    "</div>",
+                highlight: ['JPM', 'BLDR']
+            },
+            {
+                step: 3,
+                prune: [131], // Value + Small parent
+                keep: [1311, 1312],
+                explanation: "<strong>Step 3: Prune 'Value + Small' but Keep Children</strong><br>" +
+                    "Within small value stocks (F, FL, RBC), there's meaningful heterogeneity by size. " +
+                    "F ($42B) is much larger than FL/RBC ($2B/$1.5B). The granular split is informative, so we keep children " +
+                    "but prune the intermediate node to avoid redundancy." +
+                    "<div class='variance-box'>" +
+                    "<h4>📊 Mean-Variance Analysis</h4>" +
+                    "<div class='comparison-grid'>" +
+                    "<div class='metric-card'><div class='metric-label'>Parent: F+FL+RBC</div>" +
+                    "<div class='metric-value'>E[R]=15.1%, σ=48%</div></div>" +
+                    "<div class='metric-card'><div class='metric-label'>Child 1: F only</div>" +
+                    "<div class='metric-value better'>E[R]=14.2%, σ=42% ✓</div></div>" +
+                    "<div class='metric-card'><div class='metric-label'>Child 2: FL+RBC</div>" +
+                    "<div class='metric-value'>E[R]=16.0%, σ=58%</div></div>" +
+                    "<div class='metric-card'><div class='metric-label'>Information Gain</div>" +
+                    "<div class='metric-value better'>High (R²=0.42) ✓</div></div>" +
+                    "</div>" +
+                    "<p style='margin: 10px 0 0 0; font-size: 12px;'><strong>Decision:</strong> The split captures meaningful heterogeneity. " +
+                    "F's return pattern differs significantly from micro-caps FL/RBC (280bps return difference, -6% vol difference). " +
+                    "The information gain (R²=0.42) justifies the variance cost. This is a case where granularity helps - we keep both children but " +
+                    "prune the redundant parent node.</p>" +
+                    "</div>",
+                highlight: ['F', 'FL', 'RBC']
+            }
+        ];
+        
+        function flattenTree(node, arr = []) {
+            arr.push(node);
+            if (node.children) {
+                node.children.forEach(child => flattenTree(child, arr));
+            }
+            return arr;
+        }
+        
+        const allNodes = flattenTree(treeData);
+        
+        function drawTree() {
+            const svg = document.getElementById('treeSvg');
+            svg.innerHTML = '';
+            
+            // Draw links first
+            allNodes.forEach(node => {
+                if (node.children) {
+                    node.children.forEach(child => {
+                        const link = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        const d = `M ${node.x} ${node.y + 35} 
+                                   C ${node.x} ${(node.y + child.y) / 2},
+                                     ${child.x} ${(node.y + child.y) / 2},
+                                     ${child.x} ${child.y - 35}`;
+                        link.setAttribute('d', d);
+                        link.setAttribute('class', 'link');
+                        link.setAttribute('id', `link-${node.id}-${child.id}`);
+                        
+                        if (prunedNodes.has(child.id)) {
+                            link.classList.add('pruned');
+                        }
+                        
+                        svg.appendChild(link);
+                    });
+                }
+            });
+            
+            // Draw nodes
+            allNodes.forEach(node => {
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                g.setAttribute('class', 'node');
+                g.setAttribute('id', `node-${node.id}`);
+                g.setAttribute('transform', `translate(${node.x}, ${node.y})`);
+                
+                if (prunedNodes.has(node.id)) {
+                    g.classList.add('pruned');
+                }
+                if (keptNodes.has(node.id)) {
+                    g.classList.add('kept');
+                }
+                
+                // Circle
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('r', 30);
+                
+                let fill = '#e3f2fd';
+                if (node.type === 'intermediate') fill = '#fbd38d';
+                if (node.type === 'final') fill = '#9ae6b4';
+                
+                circle.setAttribute('fill', fill);
+                circle.setAttribute('stroke', '#2d3748');
+                circle.setAttribute('stroke-width', '2');
+                
+                g.appendChild(circle);
+                
+                // Label
+                const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                label.setAttribute('class', 'node-label');
+                label.setAttribute('y', -45);
+                label.textContent = node.label;
+                g.appendChild(label);
+                
+                // Info
+                const info = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                info.setAttribute('class', 'node-info');
+                info.setAttribute('y', 0);
+                info.textContent = node.info;
+                g.appendChild(info);
+                
+                // Company count
+                const count = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                count.setAttribute('class', 'node-info');
+                count.setAttribute('y', 12);
+                count.textContent = `${node.companies.length} stocks`;
+                g.appendChild(count);
+                
+                // Company tickers (for smaller nodes)
+                if (node.companies.length <= 3) {
+                    node.companies.forEach((ticker, i) => {
+                        const comp = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                        comp.setAttribute('class', 'company-label');
+                        comp.setAttribute('y', 50 + (i * 10));
+                        comp.textContent = ticker;
+                        g.appendChild(comp);
+                    });
+                }
+                
+                svg.appendChild(g);
+            });
+            
+            updateStats();
+            updatePortfolioDetails();
+        }
+        
+        function updateStats() {
+            const total = allNodes.length;
+            const kept = total - prunedNodes.size;
+            const pruningRate = Math.round((prunedNodes.size / total) * 100);
+            
+            document.getElementById('totalNodes').textContent = total;
+            document.getElementById('keptNodes').textContent = kept;
+            document.getElementById('pruningRate').textContent = pruningRate + '%';
+            document.getElementById('stocksCovered').textContent = '10';
+        }
+        
+        function updatePortfolioDetails() {
+            const details = document.getElementById('portfolioDetails');
+            details.innerHTML = '';
+            
+            // Get active leaf nodes
+            const activeNodes = allNodes.filter(n => {
+                if (prunedNodes.has(n.id)) return false;
+                if (!keptNodes.has(n.id)) return false;
+                // Is a leaf if no children or all children are pruned
+                if (!n.children) return true;
+                return n.children.every(c => prunedNodes.has(c.id));
+            });
+            
+            if (activeNodes.length > 1) {
+                const header = document.createElement('h3');
+                header.textContent = `Active Portfolios (${activeNodes.length})`;
+                header.style.marginTop = '30px';
+                details.appendChild(header);
+                
+                activeNodes.forEach(node => {
+                    const div = document.createElement('div');
+                    div.className = 'portfolio-detail';
+                    
+                    const h4 = document.createElement('h4');
+                    h4.textContent = `${node.label} (${node.companies.length} stocks)`;
+                    div.appendChild(h4);
+                    
+                    const chips = document.createElement('div');
+                    chips.className = 'company-chips';
+                    
+                    node.companies.forEach(ticker => {
+                        const chip = document.createElement('div');
+                        chip.className = 'chip';
+                        const comp = companies[ticker];
+                        chip.innerHTML = `<span class="ticker">${ticker}</span>` +
+                            `<span class="stats">$${comp.cap}B, B/M=${comp.bm}, E[R]=${comp.ret}%</span>`;
+                        chips.appendChild(chip);
+                    });
+                    
+                    div.appendChild(chips);
+                    
+                    // Add portfolio statistics
+                    const stats = calculatePortfolioStats(node.companies);
+                    const statsDiv = document.createElement('div');
+                    statsDiv.className = 'portfolio-stats';
+                    statsDiv.innerHTML = `
+                        <div class="stat-row">
+                            <span class="stat-label-small">Portfolio Expected Return:</span>
+                            <span class="stat-value-small">${stats.ret.toFixed(2)}%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label-small">Portfolio Volatility (approx):</span>
+                            <span class="stat-value-small">${stats.vol.toFixed(1)}%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label-small">Sharpe Ratio:</span>
+                            <span class="stat-value-small">${stats.sharpe.toFixed(2)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label-small">Diversification Benefit:</span>
+                            <span class="stat-value-small">${stats.diversification}</span>
+                        </div>
+                    `;
+                    div.appendChild(statsDiv);
+                    
+                    details.appendChild(div);
+                });
+            }
+        }
+        
+        function calculatePortfolioStats(tickers) {
+            // Equal-weighted portfolio statistics
+            const n = tickers.length;
+            
+            // Expected return (simple average)
+            const avgRet = tickers.reduce((sum, t) => sum + companies[t].ret, 0) / n;
+            
+            // Approximate portfolio volatility (assuming some correlation)
+            // σ_p ≈ sqrt(σ²/n + (n-1)/n * ρ * σ²)
+            // Using assumed average correlation of 0.3 for stocks in same portfolio
+            const avgVol = tickers.reduce((sum, t) => sum + companies[t].vol, 0) / n;
+            const rho = 0.3; // assumed average correlation
+            const portfolioVol = Math.sqrt(avgVol * avgVol / n + ((n - 1) / n) * rho * avgVol * avgVol);
+            
+            // Sharpe ratio (assuming 0% risk-free rate)
+            const sharpe = avgRet / portfolioVol;
+            
+            // Diversification benefit
+            const diversification = n === 1 ? 'None (single stock)' : 
+                                   n === 2 ? 'Low (2 stocks)' :
+                                   n <= 4 ? 'Moderate' : 'High';
+            
+            return {
+                ret: avgRet,
+                vol: portfolioVol,
+                sharpe: sharpe,
+                diversification: diversification
+            };
+        }
+        
+        function showFullTree() {
+            prunedNodes.clear();
+            keptNodes.clear();
+            keptNodes.add(1);
+            currentStep = 0;
+            document.getElementById('stageIndicator').textContent = 
+                'Stage: Initial Full Tree (Before Pruning) - All 15 nodes, 10 stocks';
+            document.getElementById('explanation').classList.remove('active');
+            drawTree();
+        }
+        
+        function startPruning() {
+            showFullTree();
+            setTimeout(() => {
+                document.getElementById('stageIndicator').textContent = 
+                    'Stage: Ready to Prune - Evaluating Information Gain vs Variance Cost';
+                document.getElementById('explanation').innerHTML = 
+                    '<strong>Starting Pruning Process:</strong> We will selectively remove nodes that don\'t add ' +
+                    'sufficient information to justify their estimation variance. The goal is to find the optimal ' +
+                    'trade-off between capturing complex return patterns and maintaining statistical robustness.';
+                document.getElementById('explanation').classList.add('active');
+            }, 500);
+        }
+        
+        function pruneStep() {
+            if (currentStep >= pruningSequence.length) {
+                showFinalResult();
+                return;
+            }
+            
+            const step = pruningSequence[currentStep];
+            
+            // Prune nodes
+            step.prune.forEach(id => {
+                prunedNodes.add(id);
+                // Also prune all descendants
+                const node = allNodes.find(n => n.id === id);
+                if (node && node.children) {
+                    flattenTree(node, []).forEach(n => {
+                        if (n.id !== id) prunedNodes.add(n.id);
+                    });
+                }
+            });
+            
+            // Keep nodes
+            step.keep.forEach(id => keptNodes.add(id));
+            
+            document.getElementById('stageIndicator').textContent = 
+                `Stage: Pruning Step ${step.step} of ${pruningSequence.length}`;
+            
+            document.getElementById('explanation').innerHTML = step.explanation;
+            document.getElementById('explanation').classList.add('active');
+            
+            drawTree();
+            
+            // Highlight affected nodes
+            [...step.prune, ...step.keep].forEach(id => {
+                const node = document.getElementById(`node-${id}`);
+                if (node) {
+                    node.classList.add('highlight');
+                    setTimeout(() => node.classList.remove('highlight'), 2000);
+                }
+            });
+            
+            currentStep++;
+        }
+        
+        function showFinalResult() {
+            // Complete all pruning steps
+            pruningSequence.forEach(step => {
+                step.prune.forEach(id => {
+                    prunedNodes.add(id);
+                    const node = allNodes.find(n => n.id === id);
+                    if (node && node.children) {
+                        flattenTree(node, []).forEach(n => {
+                            if (n.id !== id) prunedNodes.add(n.id);
+                        });
+                    }
+                });
+                step.keep.forEach(id => keptNodes.add(id));
+            });
+            
+            currentStep = pruningSequence.length;
+            
+            document.getElementById('stageIndicator').textContent = 
+                'Stage: Final Pruned Tree - 8 Portfolios Selected from 15 Nodes';
+            
+            document.getElementById('explanation').innerHTML = 
+                '<strong>Final Result:</strong> We kept 8 nodes out of 15 (47% pruning rate). ' +
+                'The selected portfolios range from 1 stock (JPM, CVX, F) to 10 stocks (All), creating an ' +
+                'economically meaningful hierarchy. This demonstrates the paper\'s approach: ' +
+                '<ul style="margin-top: 10px;">' +
+                '<li><strong>Kept parent:</strong> Low B/M (4 growth stocks together)</li>' +
+                '<li><strong>Kept child:</strong> Small Growth (SHOP, ETSY) - distinct segment</li>' +
+                '<li><strong>Kept parent:</strong> Medium B/M (JPM, BLDR) - no need to split 2 stocks</li>' +
+                '<li><strong>Kept children:</strong> Small Value splits - F separate from FL/RBC due to size difference</li>' +
+                '<li><strong>Kept leaf:</strong> Big Value (CVX) - single large value stock</li>' +
+                '</ul>';
+            document.getElementById('explanation').classList.add('active');
+            
+            drawTree();
+        }
+        
+        function reset() {
+            showFullTree();
+        }
+        
+        // Initialize
+        showFullTree();
+    </script>
+</body>
+</html>
