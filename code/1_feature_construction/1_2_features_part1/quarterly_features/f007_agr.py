@@ -1,0 +1,29 @@
+from __future__ import annotations
+
+import pandas as pd
+
+
+def add_agr(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Add quarterly asset growth variable.
+    """
+
+    output_df: pd.DataFrame = df.copy()
+
+    required_cols: list[str] = [
+        "atq",
+        "atq_l4",
+    ]
+
+    missing_cols: list[str] = [
+        col for col in required_cols if col not in output_df.columns
+    ]
+
+    if missing_cols:
+        raise KeyError(f"Missing required columns for quarterly agr: {missing_cols}")
+
+    output_df["agr"] = (
+        output_df["atq"] - output_df["atq_l4"]
+    ) / output_df["atq_l4"]
+
+    return output_df
