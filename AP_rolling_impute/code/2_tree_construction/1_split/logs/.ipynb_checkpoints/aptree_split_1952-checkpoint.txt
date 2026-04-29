@@ -1,2 +1,0 @@
-usage: 1_split.py [-h] --year YEAR [--depth DEPTH]
-1_split.py: error: argument --year: expected one argument

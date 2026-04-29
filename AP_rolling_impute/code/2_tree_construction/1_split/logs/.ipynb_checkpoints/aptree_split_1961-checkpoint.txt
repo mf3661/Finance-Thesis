@@ -1,3 +1,0 @@
-[INFO] Reading data from: ../../../data/1_data_processing/2_rank_data/output/ranked_data.pkl.gz
-[INFO] Year 1961: 8 months, 4501 rows
-[INFO] Saved year 1961 results to: ../../../data/2_tree_construction/1_split_by_year/output/1961

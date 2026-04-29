@@ -1,5 +1,0 @@
-[INFO] Input ports shape: (888, 31892)
-[INFO] n_train_valid: 360
-[INFO] cvN: 3
-[INFO] kmin-kmax: 5-50
-slurmstepd: error: *** JOB 47933190 ON midway3-0530 CANCELLED AT 2026-04-04T13:39:09 ***
