@@ -40,10 +40,6 @@ This folder builds the monthly firm-characteristic panel used by the AP Tree / A
 - `by_year/no_impute`: Stores ranked features without additional imputation.
 - `by_year/impute`: Stores ranked features with the imputed version used by selected robustness checks and benchmark models.
 
-### Root-level scripts
-
-- `100_chars.py`: Organizes the characteristic list used throughout the project.
-
 ## 2_tree_construction
 
 This folder constructs candidate tree portfolios from ranked firm characteristics. The pipeline has three stages: split, combine, and filter.
