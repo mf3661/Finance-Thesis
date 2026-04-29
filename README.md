@@ -145,6 +145,40 @@ Implements the Instrumented Principal Component Analysis (IPCA) benchmark used t
 - `plot_ipca_cumulative_return.png`: Cumulative return plot.
 - `plot_ipca_drawdown.png`: Drawdown plot.
 
+### 6_results
+
+Stores the final empirical outputs used in the thesis, including benchmark comparisons, robustness checks, tables, and visualizations.
+
+#### Main Contents
+
+- `performance_summary.csv`: Consolidated comparison of all models, including AP Trees, Ridge, IPCA, and benchmark portfolios.
+- `monthly_return_panel.csv`: Monthly return series for all strategies.
+- `alpha_summary.csv`: FF3 / FF5 alpha regression results across strategies.
+- `turnover_summary.csv`: Portfolio turnover and trading activity comparison.
+- `robustness_checks.csv`: Sensitivity tests across alternative specifications and hyperparameters.
+- `feature_importance.csv`: Leave-one-feature-out feature importance results.
+- `selected_features.csv`: Characteristics most frequently retained in final AP Tree specifications.
+
+#### Figures
+
+- `plot_cumulative_returns.png`: Cumulative return comparison across models.
+- `plot_drawdown_comparison.png`: Drawdown comparison across strategies.
+- `plot_sharpe_comparison.png`: Sharpe ratio comparison.
+- `plot_turnover_comparison.png`: Turnover comparison.
+- `plot_feature_importance.png`: Feature importance visualization.
+- `plot_rolling_performance.png`: Rolling out-of-sample performance over time.
+
+#### Tables
+
+- `table_main_results.tex`: Main thesis result table.
+- `table_alpha_results.tex`: Alpha regression table.
+- `table_robustness.tex`: Robustness test table.
+- `table_feature_importance.tex`: Feature importance table.
+
+### Notes
+
+This folder contains finalized outputs only. Intermediate files, temporary diagnostics, and large raw backtest objects are excluded to keep the repository organized and reproducible.
+
 ## Extra Explanations
 ### Feature Importance
 
