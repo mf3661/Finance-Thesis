@@ -1,211 +1,158 @@
 # Asset Pricing Forest
 
-## Code Descriptions
+This repository contains the empirical pipeline for constructing characteristic-based test assets and evaluating Asset Pricing Trees / Forests against standard benchmark models. The project starts from WRDS-style CRSP/Compustat data, constructs firm characteristics, builds tree-based portfolios, applies pruning and model selection, and finally reports out-of-sample performance, factor alphas, turnover, and importance measures.
 
-### 1_feature_construction
+All codes are under /code
 
-Builds the monthly firm-characteristic panel used as input for AP Tree construction, pruning, IPCA, and benchmark portfolio sorts.
+## 1_feature_construction
 
-#### 1_1_base_data
+This folder builds the monthly firm-characteristic panel used by the AP Tree / AP Forest pipeline and benchmark models.
 
-- `functions.py`: Shared helper functions for cleaning, merging, and saving intermediate datasets.
-- `1_compustat_data.py`: Extracts and cleans Compustat accounting variables.
-- `2_crsp_data.py`: Extracts and cleans CRSP stock return and market data.
+### 1_1_base_data
+
+- `functions.py`: Shared helper functions for data cleaning, merging, and saving.
+- `1_compustat_data.py`: Cleans and organizes Compustat accounting data.
+- `2_crsp_data.py`: Cleans and organizes CRSP stock return and market data.
 - `3_ccm_link.py`: Links CRSP and Compustat using the CCM link table.
-- `4_build_base.py`: Merges CRSP, Compustat, and link-table outputs into the base firm-month panel.
+- `4_build_base.py`: Builds the base firm-month panel from CRSP, Compustat, and link-table data.
 
-#### 1_2_features_part1
+### 1_2_features_part1
 
 - `generate_features_part1.py`: Runs the first batch of characteristic construction scripts.
-- `annual_features/*.py`: Constructs annual accounting-based characteristics, such as book-to-market, accruals, profitability, investment, leverage, cash, R&D, and asset growth.
+- `annual_features/*.py`: Constructs annual accounting-based characteristics.
 - `quarterly_features/*.py`: Constructs quarterly accounting-based characteristics.
-- `market_features/*.py`: Constructs market-based characteristics, including momentum, turnover, dollar volume, and dividend yield.
-- `assemble/build_assemble_features.py`: Merges annual, quarterly, and market features.
-- `assemble/f001_populate_to_monthly.py`: Expands lower-frequency accounting features to monthly observations.
+- `market_features/*.py`: Constructs market-based characteristics.
+- `assemble/build_assemble_features.py`: Combines annual, quarterly, and market feature blocks.
+- `assemble/f001_populate_to_monthly.py`: Expands lower-frequency accounting features to the monthly panel.
 - `assemble/f002_recompute_monthly_me_features.py`: Recomputes market-equity-related variables at monthly frequency.
-- `assemble/f003_select_final_columns.py`: Selects the final feature columns for downstream analysis.
+- `assemble/f003_select_final_columns.py`: Selects the final columns used in downstream feature construction.
 
-#### 1_3_features_part2
+### 1_3_features_part2
 
-- `generate_features_part2.py`: Runs the second batch of additional characteristic scripts.
-- `monthly_extra/*.py`: Constructs additional monthly characteristics, such as beta, residual variance, bid-ask spread, illiquidity, maximum return, zero trading, and real estate exposure.
+- `generate_features_part2.py`: Runs the second batch of additional characteristic construction scripts.
+- `monthly_extra/*.py`: Constructs additional monthly market-based characteristics.
 - `quarterly_extra/*.py`: Constructs additional quarterly characteristics.
-- `assemble_raw/`: Combines the extra feature outputs into the raw feature panel.
+- `assemble_raw/`: Combines the additional features into the raw feature panel.
 
-#### 1_4_rank_feature
+### 1_4_rank_feature
 
-- `generate_rank_features.py`: Cross-sectionally ranks firm characteristics by month and produces the ranked feature panel used for AP Tree splits.
+- `generate_rank_features.py`: Cross-sectionally ranks firm characteristics by month and creates the ranked feature panel.
+- `by_year/no_impute`: Stores ranked features without additional imputation.
+- `by_year/impute`: Stores ranked features with the imputed version used by selected robustness checks and benchmark models.
 
-#### Root-level files
+### Root-level scripts
 
-- `100_chars.py`: Defines or organizes the full set of characteristics used in the empirical pipeline.
-- `untitled.py`: Temporary or exploratory script; not part of the main production pipeline.
+- `100_chars.py`: Organizes the characteristic list used throughout the project.
 
-### 2_tree_construction
+## 2_tree_construction
 
-Constructs AP Tree candidate portfolios from ranked firm characteristics and prepares them for pruning.
+This folder constructs candidate tree portfolios from ranked firm characteristics. The pipeline has three stages: split, combine, and filter.
 
-#### 2_1_split
+### 2_1_split
 
-- `2_1_1_split.py`: Builds baseline AP Tree splits using ranked characteristics.
-- `2_1_2_split_ew.py`: Builds equal-weighted tree split portfolios.
-- `2_1_3_split_impute.py`: Builds tree splits using the imputed feature panel.
-- `2_1_4_split_benchmark.py`: Builds benchmark sorting portfolios for comparison.
-- `2_1_5_split_ptree.py`: Builds pruned-tree candidate splits for later selection.
+- `2_1_1_split.py`: Builds the baseline AP Forest I candidate trees using no-impute ranked characteristics.
+- `2_1_2_split_ew.py`: Builds the equal-weighted AP Forest candidate trees.
+- `2_1_3_split_impute.py`: Builds the imputed-feature AP Forest candidate trees.
+- `2_1_4_split_benchmark.py`: Builds the AP Tree / benchmark sorting candidate portfolios.
+- `2_1_5_split_ptree.py`: Builds the AP Forest II / pruned-tree candidate portfolios.
 
-#### 2_2_combine_portfolio
+### 2_2_combine_portfolio
 
-- `2_2_1_combine_portfolio.py`: Combines split-level outputs into portfolio return panels.
-- `2_2_2_combine_ew.py`: Combines equal-weighted tree portfolio outputs.
-- `2_2_3_combine_impute.py`: Combines imputed-data tree portfolio outputs.
-- `2_2_4_combine_benchmark.py`: Combines benchmark portfolio outputs.
-- `2_2_5_combine_ptree.py`: Combines pruned-tree candidate portfolio outputs.
+- `2_2_1_combine_portfolio.py`: Combines AP Forest I split-level node returns into a portfolio return matrix.
+- `2_2_2_combine_ew.py`: Combines equal-weighted AP Forest candidate portfolios.
+- `2_2_3_combine_impute.py`: Combines imputed-feature AP Forest candidate portfolios.
+- `2_2_4_combine_benchmark.py`: Combines AP Tree / benchmark candidate portfolios.
+- `2_2_5_combine_ptree.py`: Combines AP Forest II / pruned-tree candidate portfolios.
 
-#### 2_3_filter
+### 2_3_filter
 
-- `2_3_1_filter.py`: Filters constructed tree portfolios before pruning.
-- `2_3_2_filter_ew.py`: Filters equal-weighted portfolio outputs.
-- `2_3_3_filter_impute.py`: Filters imputed-data portfolio outputs.
-- `2_3_4_filter_benchmark.py`: Filters benchmark sorting portfolio outputs.
-- `2_3_5_filter_ptree.py`: Filters pruned-tree candidate portfolios.
+- `2_3_1_filter.py`: Filters AP Forest I candidate portfolios before pruning.
+- `2_3_2_filter_ew.py`: Filters equal-weighted AP Forest candidate portfolios.
+- `2_3_3_filter_impute.py`: Filters imputed-feature AP Forest candidate portfolios.
+- `2_3_4_filter_benchmark.py`: Filters AP Tree / benchmark candidate portfolios.
+- `2_3_5_filter_ptree.py`: Filters AP Forest II / pruned-tree candidate portfolios.
 
-### 3_ap_prune
+## 3_ap_prune
 
-Implements the pruning stage of the AP Tree framework, selecting an optimal sparse subset of candidate portfolios using cross-validation and out-of-sample performance criteria.
+This folder implements the pruning stage. It selects sparse combinations of candidate tree portfolios using rolling train / validation / test windows.
 
-#### 1_prune_cv
+### 3_1_prune_cv
 
-- `1_prune_cv.py`: Main pruning engine that performs cross-validation over candidate AP Tree portfolios and selects the optimal portfolio subset.
-- `submit.sh`: Batch submission script for running pruning jobs in parallel on the cluster.
-- `ensemble_first9_summary.py`: Summarizes results across the first nine repeated pruning runs.
-- `ensemble_first9_summary_2.py`: Extended ensemble summary script for repeated-run robustness checks.
-- `logs/`: Cluster job logs for pruning runs.
+- `3_1_1_prune_cv.py`: Runs pruning and cross-validation for AP Forest I.
+- `3_1_2_prune_cv_ew.py`: Runs pruning and cross-validation for the equal-weighted AP Forest.
+- `3_1_3_prune_cv_impute.py`: Runs pruning and cross-validation for the imputed-feature AP Forest.
+- `3_1_4_prune_cv_benchmark.py`: Runs pruning and cross-validation for the AP Tree / benchmark version.
+- `3_1_5_prune_cv_ptree.py`: Runs pruning and cross-validation for AP Forest II / pruned-tree portfolios.
+- `submit*.sh`: Cluster submission scripts for running pruning jobs in parallel.
+- `logs/`: Cluster logs for pruning jobs.
 
-**Generated outputs**
-- `ensemble_summary.csv`: Final pruning performance summary across runs.
-- `ensemble_monthly_ret.csv`: Monthly long-short portfolio returns after pruning.
-- `ensemble_monthly_ret_detail.csv`: Detailed monthly return decomposition.
-- `ensemble_yearly_sr.csv`: Annual Sharpe ratios of pruned strategies.
-- `ensemble_yearly_sr_detail.csv`: Detailed yearly Sharpe statistics.
-- `ensemble_repeat_avg_sr.csv`: Average Sharpe ratio across repeated runs.
-- `ensemble_first_9_repeats_summary.csv`: Summary of first nine repeated runs.
-- `ensemble_first_9_repeats_timeseries.csv`: Return time series for first nine repeated runs.
-- `plot_cumulative_return.png`: Cumulative return plot.
-- `plot_drawdown.png`: Drawdown plot.
-- `plot_monthly_return.png`: Monthly return visualization.
-- `plot_yearly_sharpe.png`: Yearly Sharpe ratio visualization.
+## 3_ridge
 
-#### 2_selection
+This folder implements the ridge regression benchmark.
 
-- `1_selection.py`: Final model selection script that chooses the preferred pruning specification after cross-validation.
-- `submit.sh`: Batch submission script for final selection runs.
-- `logs/`: Cluster logs for selection jobs.
+### 3_1_run_ridge
 
-### 4_ridge
+- `3_1_1_ridge.py`: Fits rolling ridge models, selects the penalty parameter by validation MSE, predicts out-of-sample stock returns, and forms value-weighted long-short portfolios from the top and bottom predicted-return stocks.
 
-Implements the ridge regression benchmark used to compare AP Trees against regularized linear prediction models in the cross-section of stock returns.
+## 3_IPCA
 
-#### Main Scripts
+This folder implements the IPCA benchmark.
 
-- `4_1_ridge.py`: Main ridge regression pipeline. Estimates monthly cross-sectional ridge models using firm characteristics and forms long-short portfolios from predicted returns.
-- `4_2_ridge_cv.py`: Selects the optimal ridge penalty parameter through cross-validation or rolling validation.
-- `4_3_ridge_oos.py`: Generates out-of-sample portfolio returns and prediction results using the selected ridge specification.
-- `4_4_ridge_summary.py`: Summarizes benchmark performance, including return, Sharpe ratio, alpha, and turnover statistics.
-- `submit.sh`: Batch submission script for running ridge jobs in parallel on the cluster.
-- `logs/`: Cluster job logs for ridge estimation runs.
+### 3_1_run_IPCA
 
-#### Generated Outputs
+- `3_1_1_ipca.py`: Fits rolling IPCA models, selects the number of factors by validation MSE, predicts out-of-sample stock returns using mean-factor prediction, and forms value-weighted long-short portfolios from the top and bottom predicted-return stocks.
 
-- `ridge_monthly_ret.csv`: Monthly long-short returns from the ridge benchmark.
-- `ridge_summary.csv`: Overall performance summary of the ridge strategy.
-- `ridge_yearly_sr.csv`: Annual Sharpe ratio series.
-- `ridge_predictions.csv`: Predicted cross-sectional returns from the ridge model.
-- `plot_ridge_cumulative_return.png`: Cumulative return plot.
-- `plot_ridge_drawdown.png`: Drawdown plot.
+## 4_results
 
-### 5_IPCA
+This folder contains scripts for final empirical evaluation, figures, factor regressions, turnover, and importance analysis.
 
-Implements the Instrumented Principal Component Analysis (IPCA) benchmark used to compare AP Trees against characteristic-based latent factor models.
+### 4_1_pnl
 
-#### Main Scripts
+- `4_1_1_ap_forestI.py`: Constructs monthly AP Forest I out-of-sample returns from selected pruning results.
+- `4_1_2_ap_forest_ew.py`: Constructs monthly equal-weighted AP Forest out-of-sample returns.
+- `4_1_3_ap_forest_impute.py`: Constructs monthly imputed-feature AP Forest out-of-sample returns.
+- `4_1_4_ap_forest_benchmark.py`: Constructs monthly AP Tree / benchmark out-of-sample returns.
+- `4_1_5_ap_forestII.py`: Constructs monthly AP Forest II out-of-sample returns.
+- `4_1_6_IPCA.py`: Aggregates IPCA out-of-sample returns into the common return format.
+- `4_1_7_ridge.py`: Aggregates ridge out-of-sample returns into the common return format.
+- `4_1_8_figure6.py`: Plots cumulative log returns for the main model comparison.
+- `4_1_9_figure7.py`: Compares value-weighted and equal-weighted AP Forest performance.
+- `4_1_10_figure8.py`: Compares no-impute and impute AP Forest performance.
+- `4_1_11_figure9.py`: Provides sample code for plotting AP Forest performance under different ensemble-size settings.
 
-- `5_1_ipca.py`: Main IPCA estimation pipeline. Uses firm characteristics as instruments to estimate latent factors and factor loadings.
-- `5_2_ipca_cv.py`: Selects the optimal number of latent factors and model settings through cross-validation or rolling validation.
-- `5_3_ipca_oos.py`: Generates out-of-sample expected returns and portfolio returns using the estimated IPCA model.
-- `5_4_ipca_summary.py`: Summarizes benchmark performance, including return, Sharpe ratio, alpha, and turnover statistics.
-- `submit.sh`: Batch submission script for running IPCA jobs in parallel on the cluster.
-- `logs/`: Cluster job logs for IPCA estimation runs.
+### 4_2_FF3
 
-#### Generated Outputs
+- `4_2_1_FF3_regression.py`: Runs Fama-French three-factor regressions for all main strategy returns.
 
-- `ipca_monthly_ret.csv`: Monthly long-short returns from the IPCA benchmark.
-- `ipca_summary.csv`: Overall performance summary of the IPCA strategy.
-- `ipca_yearly_sr.csv`: Annual Sharpe ratio series.
-- `ipca_predictions.csv`: Predicted cross-sectional returns from the IPCA model.
-- `plot_ipca_cumulative_return.png`: Cumulative return plot.
-- `plot_ipca_drawdown.png`: Drawdown plot.
+### 4_3_FF5
 
-### 6_results
+- `4_3_1_FF5_regression.py`: Runs Fama-French five-factor regressions for all main strategy returns.
 
-Stores the final empirical outputs used in the thesis, including benchmark comparisons, robustness checks, tables, and visualizations.
+### 4_4_turnover
 
-#### Main Contents
+- `4_4_1_turnover_ap_forestI.py`: Computes drift-adjusted turnover for AP Forest I.
+- `4_4_4_turnover_IPCA.py`: Computes drift-adjusted turnover for IPCA.
+- `4_4_5_turnover_ptree.py`: Computes drift-adjusted turnover for AP Forest II / pruned-tree portfolios.
+- `4_4_5_turnover_ridge.py`: Computes drift-adjusted turnover for the ridge benchmark.
 
-- `performance_summary.csv`: Consolidated comparison of all models, including AP Trees, Ridge, IPCA, and benchmark portfolios.
-- `monthly_return_panel.csv`: Monthly return series for all strategies.
-- `alpha_summary.csv`: FF3 / FF5 alpha regression results across strategies.
-- `turnover_summary.csv`: Portfolio turnover and trading activity comparison.
-- `robustness_checks.csv`: Sensitivity tests across alternative specifications and hyperparameters.
-- `feature_importance.csv`: Leave-one-feature-out feature importance results.
-- `selected_features.csv`: Characteristics most frequently retained in final AP Tree specifications.
+### 4_5_importance
 
-#### Figures
+- `4_5_1_interaction_importance.py`: Computes interaction importance for AP Forest I by decoding selected tree paths and aggregating selected node weights across rolling windows and repeats.
 
-- `plot_cumulative_returns.png`: Cumulative return comparison across models.
-- `plot_drawdown_comparison.png`: Drawdown comparison across strategies.
-- `plot_sharpe_comparison.png`: Sharpe ratio comparison.
-- `plot_turnover_comparison.png`: Turnover comparison.
-- `plot_feature_importance.png`: Feature importance visualization.
-- `plot_rolling_performance.png`: Rolling out-of-sample performance over time.
+## Main Empirical Design
 
-#### Tables
+The main out-of-sample evaluation uses a rolling-window design. For each test year, the model uses an initial training period, a validation period for hyperparameter selection, and a one-year out-of-sample test period. The AP Forest models build many characteristic-based tree portfolios, prune the candidate set using validation performance, and combine selected portfolios into the final out-of-sample strategy.
 
-- `table_main_results.tex`: Main thesis result table.
-- `table_alpha_results.tex`: Alpha regression table.
-- `table_robustness.tex`: Robustness test table.
-- `table_feature_importance.tex`: Feature importance table.
+The main AP Forest variants are:
 
-### Notes
+- `AP forest I`: Baseline AP Forest using no-impute ranked characteristics.
+- `AP forest EW`: Equal-weighted AP Forest robustness check.
+- `AP forest Impute`: AP Forest using imputed ranked characteristics.
+- `AP tree`: Benchmark AP Tree / sorting-based version.
+- `AP forest II`: Pruned-tree version with a different split and selection structure.
+- `IPCA`: Characteristic-based latent factor benchmark.
+- `Ridge`: Regularized linear prediction benchmark.
 
-This folder contains finalized outputs only. Intermediate files, temporary diagnostics, and large raw backtest objects are excluded to keep the repository organized and reproducible.
+## Notes
 
-## Extra Explanations
-### Feature Importance
-
-Feature importance is evaluated through a manual leave-one-feature-out procedure rather than a standalone script.
-
-For each firm characteristic, we remove the feature from the input set and rerun the **entire AP Tree pipeline**, including:
-
-1. Feature construction  
-2. Tree construction  
-3. Portfolio combination and filtering  
-4. Pruning / cross-validation  
-5. Out-of-sample portfolio evaluation  
-
-The importance of a characteristic is measured by the change in final performance after exclusion, such as:
-
-- Sharpe ratio decline  
-- Return reduction  
-- Alpha deterioration  
-- Changes in selected tree structures  
-
-We do not provide a dedicated feature-importance script because importance in our framework is **model-level rather than node-level**. The contribution of a characteristic affects every stage of the pipeline: candidate tree splits, portfolio interactions, pruning decisions, and final portfolio weights. As a result, meaningful importance must be evaluated by rerunning the full project after removing each feature.
-
-This process is computationally expensive and depends on the user’s chosen specifications (sample period, hyperparameters, rolling windows, benchmark settings, etc.). A standalone script would therefore be misleading or incomplete. Instead, feature importance should be implemented as a full re-estimation exercise under the user’s preferred setup.
-
-Compared with simple split-frequency or impurity metrics, this leave-one-feature-out approach provides a more economically relevant measure because it captures each characteristic’s contribution to final out-of-sample investment performance.
-
-
-
-**Note:** AI help review and debug our code, and reformulate code. AI is not used in coding pipeline.
-
+AI assistance was used to review, debug, and reformulate code. AI was not used to replace the empirical research design or final interpretation.
